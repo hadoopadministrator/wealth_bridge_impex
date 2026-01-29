@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:wealth_bridge_impex/controllers/live_rate_controller.dart';
 import 'package:wealth_bridge_impex/screens/check_out_screen.dart';
 import 'package:wealth_bridge_impex/widgets/drawer_widget.dart';
 import 'package:wealth_bridge_impex/widgets/price_widget.dart';
@@ -113,7 +115,7 @@ class LivePriceScreen extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                           Navigator.push(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const CheckOutScreen(),

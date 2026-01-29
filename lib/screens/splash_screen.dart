@@ -24,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -31,11 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  color: Colors.grey[200],
-                  // padding: const EdgeInsets.only(left: 40, right: 40),
-                  child: Image.asset('assets/logo/logo.jpeg', height: 180, width: 280, fit: BoxFit.fill,),
-                ),
+                Image.asset('assets/logo/logo.jpeg',  width: 305, fit: BoxFit.contain,),
                 const SizedBox(height: 16),
                 Text(
                   'Wealth Bridge Impex',

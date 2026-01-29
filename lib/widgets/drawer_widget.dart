@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wealth_bridge_impex/screens/login_screen.dart';
 import 'package:wealth_bridge_impex/screens/order_history.dart';
 import 'package:wealth_bridge_impex/screens/profile_screen.dart';
 
@@ -78,7 +79,11 @@ class DrawerWidget extends StatelessWidget {
             leading: const Icon(Icons.logout, color: Colors.black),
             title: const Text('Logout', style: TextStyle(fontSize: 18)),
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+                (route) => false,
+              );
             },
           ),
         ],
