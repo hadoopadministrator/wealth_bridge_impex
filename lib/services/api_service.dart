@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -27,24 +29,38 @@ class ApiService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        debugPrint('Register Response: ${response.body}');
+        debugPrint('Register Raw Response: ${response.body}');
 
-        // Assuming API returns plain text like "User already exists" or "Success"
-        final body = response.body.toLowerCase();
+        // Remove XML wrapper
+        final cleanText = response.body
+            .replaceAll(RegExp(r'<[^>]*>'), '')
+            .trim()
+            .toLowerCase();
 
-        if (body.contains('success')) {
-          return {'success': true, 'message': 'Registration successful'};
-        } else if (body.contains('already exists')) {
-          return {'success': false, 'message': 'User already exists'};
-        } else {
-          return {'success': false, 'message': 'Registration failed'};
-        }
+        debugPrint('Register Clean Text: $cleanText');
+
+       if (cleanText == 'success') {
+        return {
+          'success': true,
+          'message': 'Registration successful',
+        };
+      } else if (cleanText.contains('already')) {
+        return {
+          'success': false,
+          'message': 'User already exists',
+        };
       } else {
         return {
           'success': false,
-          'message': 'Server error: ${response.statusCode}',
+          'message': 'Registration failed',
         };
       }
+    } else {
+      return {
+        'success': false,
+        'message': 'Server error: ${response.statusCode}',
+      };
+    }
     } catch (e) {
       debugPrint('Register Error: $e');
       return {'success': false, 'message': 'Something went wrong'};
@@ -66,12 +82,26 @@ class ApiService {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
-        debugPrint('Login Response: ${response.body}');
+        debugPrint('Login Raw Response: ${response.body}');
+        // Remove XML wrapper
+        final xmlRemoved = response.body
+            .replaceAll(RegExp(r'<[^>]*>'), '')
+            .trim();
 
-        final body = response.body.toLowerCase();
+        debugPrint('Login Clean JSON: $xmlRemoved');
+        // Decode JSON
+        final Map<String, dynamic> userData = jsonDecode(xmlRemoved);
 
-        debugPrint('Response---------: $body');
-        return {'success': true, 'message': 'Login successful'};
+        // Check login success
+        if (userData.containsKey('ID')) {
+          return {
+            'success': true,
+            'message': 'Login successful',
+            'data': userData,
+          };
+        } else {
+          return {'success': false, 'message': 'Invalid mobile or password'};
+        }
       } else {
         return {
           'success': false,
