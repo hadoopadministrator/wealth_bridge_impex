@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/screens/order_success_screen.dart';
+import 'package:wealth_bridge_impex/routes/app_routes.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
@@ -84,11 +84,9 @@ class PaymentScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushReplacement(
+                  Navigator.pushReplacementNamed(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const OrderSuccessScreen(),
-                    ),
+                    AppRoutes.orderSuccess,
                   );
                 },
                 child: const Text("Pay ₹5050", style: TextStyle(fontSize: 18)),

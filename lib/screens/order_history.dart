@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/screens/live_price_screen.dart';
 import 'package:wealth_bridge_impex/widgets/order_card.dart';
 
 class OrderHistory extends StatefulWidget {
@@ -50,18 +49,16 @@ class _OrderHistoryState extends State<OrderHistory> {
     return Scaffold(
       backgroundColor: const Color(0xffF5F6FA),
       appBar: AppBar(
-        leading: BackButton(
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LivePriceScreen(),
-              ),
-              (route) => false,
-            );
-          },
-        ),
+        // leading: BackButton(
+        //   color: Colors.black,
+        //   onPressed: () {
+        //     Navigator.pushNamedAndRemoveUntil(
+        //       context,
+        //       AppRoutes.orderHistory,
+        //       (route) => route.settings.name == AppRoutes.liveRates,
+        //     );
+        //   },
+        // ),
         elevation: 0,
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Colors.black),

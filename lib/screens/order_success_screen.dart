@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/screens/live_price_screen.dart';
-import 'package:wealth_bridge_impex/screens/order_history.dart';
+import 'package:wealth_bridge_impex/routes/app_routes.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
   const OrderSuccessScreen({super.key});
@@ -58,13 +57,10 @@ class OrderSuccessScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // Go to Order History
-                  Navigator.pushAndRemoveUntil(
+                  Navigator.pushNamedAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
-                      builder: (context) => const OrderHistory(),
-                    ),
-                    (route) => route.isFirst,
+                    AppRoutes.orderHistory,
+                    (route) => route.settings.name == AppRoutes.liveRates,
                   );
                 },
                 child: const Text("View Order History"),
@@ -81,14 +77,7 @@ class OrderSuccessScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  // Back to home
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LivePriceScreen(),
-                    ),
-                    (route) => route.isFirst,
-                  );
+                  Navigator.popUntil(context, (route) => route.isFirst);
                 },
                 child: const Text(
                   "Back to Home",

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:wealth_bridge_impex/screens/payment_screen.dart';
+import 'package:wealth_bridge_impex/routes/app_routes.dart';
 
 class CheckOutScreen extends StatelessWidget {
   const CheckOutScreen({super.key});
@@ -142,15 +142,7 @@ class CheckOutScreen extends StatelessWidget {
                   foregroundColor: Colors.white,
                 ),
                 onPressed: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => const PaymentScreen(),
-                  //   ),
-                  // );
-                   ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Payment Integration Coming Soon!')),
-                    );
+                  Navigator.pushNamed(context, AppRoutes.payment);
                 },
                 child: const Text(
                   'Proceed to Payment',
