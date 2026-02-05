@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:wealth_bridge_impex/routes/app_routes.dart';
+import 'package:wealth_bridge_impex/services/auth_storage.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});
@@ -20,7 +21,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           /// HEADER
           DrawerHeader(
             decoration: const BoxDecoration(color: Colors.white),
-            child: Image.asset('assets/logo/logo.jpeg', fit: BoxFit.fill),
+            child: Image.asset('assets/logo/logo.jpeg', fit: BoxFit.contain),
           ),
 
           /// LIVE PRICES (HOME)
@@ -29,8 +30,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             leading: const Icon(Icons.home, color: Colors.black),
             title: const Text('Live Prices', style: TextStyle(fontSize: 18)),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.liveRates,
+                (route) => false,
+              );
             },
           ),
 
@@ -53,7 +57,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('Order History', style: TextStyle(fontSize: 18)),
             onTap: () {
               Navigator.pop(context); // close drawer
-              Navigator.pushNamed(context, AppRoutes.orderHistory);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Coming Soon!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+              // Navigator.pushNamed(context, AppRoutes.orderHistory);
             },
           ),
 
@@ -64,12 +74,21 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               'Visit our Website',
               style: TextStyle(fontSize: 18),
             ),
-            onTap: () {
+            onTap: () async {
+              final messenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
-              // open website using url_launcher
+
+              final Uri url = Uri.parse('https://wealthbridgeimpex.com/');
+
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              } else {
+                messenger.showSnackBar(
+                  const SnackBar(content: Text('Could not launch website')),
+                );
+              }
             },
           ),
-
           /// CONTACT US
           ListTile(
             leading: const Icon(Icons.contact_mail, color: Colors.black),
@@ -96,7 +115,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('Share this App', style: TextStyle(fontSize: 18)),
             onTap: () {
               Navigator.pop(context);
-              // share app link
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Coming Soon!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
             },
           ),
 
@@ -106,7 +130,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('Rate this App', style: TextStyle(fontSize: 18)),
             onTap: () {
               Navigator.pop(context);
-              // open play store
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Coming Soon!'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
             },
           ),
 
@@ -123,8 +152,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   Future<void> _logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+    await AuthStorage.clear();
 
     if (!mounted) return;
 

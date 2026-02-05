@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wealth_bridge_impex/routes/app_routes.dart';
 import 'package:wealth_bridge_impex/services/api_service.dart';
+import 'package:wealth_bridge_impex/services/auth_storage.dart';
 import 'package:wealth_bridge_impex/utils/input_decoration.dart';
+import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,15 +14,15 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  
   final _formKey = GlobalKey<FormState>(); // Form key for validation
-  final TextEditingController _emailOrMobileController =
-      TextEditingController();
+  final TextEditingController _emailOrMobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   final ApiService _apiService = ApiService();
   bool _isLoading = false;
   bool _obscurePassword = true;
-   bool remember = false;
+  bool remember = false;
   bool _isValidEmail(String value) {
     return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value);
   }
@@ -96,9 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         FilteringTextInputFormatter.allow(
                           RegExp(r'[0-9a-zA-Z@._-]'),
                         ),
-                        LengthLimitingTextInputFormatter(
-                          50, // enough for email, mobile stops at 10 logically
-                        ),
+                        LengthLimitingTextInputFormatter(50),
                       ],
                       onChanged: (_) => setState(() {}),
                       validator: (value) {
@@ -156,60 +155,41 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                    ),const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: remember,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                            activeColor: Colors.blue,
-                            onChanged: (value) {
-                              setState(() => remember = value ?? false);
-                            },
-                          ),
-                          Text(
-                            'Remember me',
-                            style: TextStyle(color: Colors.black),
-                          ),
-                          const Spacer(),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushNamed(context, AppRoutes.forgot);
-                            },
-                            child: Text(
-                              'Forgot passsword?',
-                              style: TextStyle(
-                                color: Colors.blue,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: remember,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          activeColor: Colors.blue,
+                          onChanged: (value) {
+                            setState(() => remember = value ?? false);
+                          },
                         ),
-                        backgroundColor: const Color(0xffF9B236),
-                        foregroundColor: Colors.black,
-                      ),
-                      onPressed: _isLoading || !_isFormValid
-                          ? null
-                          : _onLoginPressed,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 22,
-                              width: 22,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.black,
-                              ),
-                            )
-                          : const Text('Login', style: TextStyle(fontSize: 18)),
+                        Text(
+                          'Remember me',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushNamed(context, AppRoutes.forgot);
+                          },
+                          child: Text(
+                            'Forgot passsword?',
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    CustomButton(
+                      text: 'Login',
+                      onPressed: _isFormValid ? _onLoginPressed : null,
+                      isLoading: _isLoading,
                     ),
                     const SizedBox(height: 20),
                     Row(
@@ -240,41 +220,41 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _saveLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true);
-  }
-
   Future<void> _onLoginPressed() async {
     if (!_formKey.currentState!.validate()) return;
-    // Safety check, Only proceed if all validators passs
+
     setState(() => _isLoading = true);
 
     try {
       final response = await _apiService.loginUser(
-      emailOrMobile: _emailOrMobileController.text.trim(),
-      password: _passwordController.text.trim(),
-    );
+        emailOrMobile: _emailOrMobileController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-    final bool isSuccess = response['success'] == true;
-    final String message =
-        (response['message']?.toString().isNotEmpty ?? false)
-            ? response['message']
-            : (isSuccess ? 'Login successful' : 'Login failed');
+      final bool isSuccess = response['success'] == true;
+      final String message = response['message'] ?? 'Login failed';
 
-    if (isSuccess) {
-      await _saveLoginStatus();
-      _showMessage(message);
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoutes.liveRates);
-    } else {
-      _showMessage(message);
-    }
+      if (isSuccess) {
+        final data = response['data'];
+
+        await AuthStorage.saveLoginData(
+          userId: data['Id'],
+          email: data['Email'],
+          mobile: data['Mobile'],
+        );
+
+        _showMessage(message);
+
+        if (!mounted) return;
+        Navigator.pushReplacementNamed(context, AppRoutes.liveRates);
+      } else {
+        _showMessage(message);
+      }
     } catch (e) {
-    _showMessage('Something went wrong. Please try again.');
-  } finally {
-    if (mounted) setState(() => _isLoading = false);
-  }
+      _showMessage('Something went wrong. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _showMessage(String msg) {

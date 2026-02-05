@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:wealth_bridge_impex/routes/app_routes.dart';
 import 'package:wealth_bridge_impex/services/api_service.dart';
 import 'package:wealth_bridge_impex/utils/input_decoration.dart';
+import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -240,31 +241,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
                       const SizedBox(height: 30),
-                      ElevatedButton(
-                        onPressed: _isLoading || !_isFormValid
-                            ? null
-                            : _onRegisterPressed,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xffF9B236),
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 16.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 22,
-                                width: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.black,
-                                ),
-                              )
-                            : const Text(
-                                'Register',
-                                style: TextStyle(fontSize: 18),
-                              ),
+                      CustomButton(
+                        text: 'Register',
+                        onPressed: _isFormValid ? _onRegisterPressed : null,
+                        isLoading: _isLoading,
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -303,48 +283,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _onRegisterPressed() async {
-  if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) return;
 
-  if (_gstController.text.trim().isEmpty) {
-    _showMessage('Please enter GST');
-    return;
-  }
-
-  setState(() => _isLoading = true);
-
-  try {
-    final response = await _apiService.registerUser(
-      fullName: _fullNameController.text.trim(),
-      email: _emailController.text.trim(),
-      mobile: _mobileController.text.trim(),
-      password: _passwordController.text.trim(),
-      address: _addressController.text.trim(),
-      landmark: _landmarkController.text.trim(),
-      pincode: _pincodeController.text.trim(),
-      gst: _gstController.text.trim(),
-    );
-
-    if (!mounted) return;
-
-    debugPrint('Response---- $response');
-
-    final bool isSuccess = response['success'] == true;
-    final String message =
-        response['message']?.toString() ??
-        (isSuccess ? 'Registration successful' : 'Registration failed');
-
-    _showMessage(message);
-
-    if (isSuccess) {
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    if (_gstController.text.trim().isEmpty) {
+      _showMessage('Please enter GST');
+      return;
     }
-  } catch (e) {
-    _showMessage('Something went wrong. Please try again.');
-  } finally {
-    if (mounted) setState(() => _isLoading = false);
-  }
-}
 
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await _apiService.registerUser(
+        fullName: _fullNameController.text.trim(),
+        email: _emailController.text.trim(),
+        mobile: _mobileController.text.trim(),
+        password: _passwordController.text.trim(),
+        address: _addressController.text.trim(),
+        landmark: _landmarkController.text.trim(),
+        pincode: _pincodeController.text.trim(),
+        gst: _gstController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      debugPrint('Response---- $response');
+
+      final bool isSuccess = response['success'] == true;
+      final String message =
+          response['message']?.toString() ??
+          (isSuccess ? 'Registration successful' : 'Registration failed');
+
+      _showMessage(message);
+
+      if (isSuccess) {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
+    } catch (e) {
+      _showMessage('Something went wrong. Please try again.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   void _showMessage(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));

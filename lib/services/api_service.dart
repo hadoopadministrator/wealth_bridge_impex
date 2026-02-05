@@ -66,99 +66,157 @@ class ApiService {
   }
 
   /// LOGIN USER (GET)
-  Future<Map<String, dynamic>> loginUser({
-    required String emailOrMobile,
-    required String password,
-  }) async {
-    final Uri url = Uri.parse('$_baseUrl/LoginUser').replace(
-      queryParameters: {
-        'emailOrMobile': emailOrMobile.trim(),
-        'password': password.trim(),
-      },
-    );
+  /// LOGIN USER (GET)
+ Future<Map<String, dynamic>> loginUser({
+  required String emailOrMobile,
+  required String password,
+}) async {
+  final Uri url = Uri.parse('$_baseUrl/LoginUser').replace(
+    queryParameters: {
+      'emailOrMobile': emailOrMobile.trim(),
+      'password': password.trim(),
+    },
+  );
 
-    debugPrint('Login API URL: $url');
+  try {
+    final response = await http.get(url);
 
-    try {
-      final response = await http.get(url);
-
-      if (response.statusCode != 200) {
-        return {
-          'success': false,
-          'message': 'Server error: ${response.statusCode}',
-        };
-      }
-
-      final cleanJson = response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
-
-      debugPrint('response: $cleanJson');
-
-      final Map<String, dynamic> jsonData = jsonDecode(cleanJson);
-
-      final bool isSuccess =
-          jsonData['Status']?.toString().toLowerCase() == 'success';
-
-      return {
-        'success': isSuccess,
-        'message':
-            jsonData['Message']?.toString() ??
-            (isSuccess ? 'Login successful' : 'Login failed'),
-        'data': jsonData,
-      };
-    } catch (e) {
-      debugPrint('Login Error: $e');
-      return {'success': false, 'message': 'Something went wrong'};
+    if (response.statusCode != 200) {
+      return {'success': false, 'message': 'Server error'};
     }
+
+    final cleanJson =
+        response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+    final Map<String, dynamic> jsonData = jsonDecode(cleanJson);
+
+    final bool isSuccess =
+        jsonData['Status']?.toString().toLowerCase() == 'success';
+
+    return {
+      'success': isSuccess,
+      'message': jsonData['Message'] ??
+          (isSuccess ? 'Login successful' : 'Login failed'),
+      'data': jsonData,
+    };
+  } catch (e) {
+    return {'success': false, 'message': 'Something went wrong'};
   }
+}
 
   /// Update User Profile
   Future<void> updateUserProfile({
-  required int id,
-  required String fullname,
-  required String email,
-  required String mobile,
-  required String address,
-  required String landmark,
-  required String pincode,
-  required String gst,
-}) async {
-  final Uri url =
-      Uri.parse('https://wealthbridgeimpex.com/webservice.asmx');
+    required int id,
+    required String fullname,
+    required String email,
+    required String mobile,
+    required String address,
+    required String landmark,
+    required String pincode,
+    required String gst,
+  }) async {
+    final Uri url = Uri.parse('$_baseUrl/UpdateUserProfile');
 
-  final String body = '''
-<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-  <soap:Body>
-    <UpdateUserProfile xmlns="http://tempuri.org/">
-      <id>$id</id>
-      <fullname>$fullname</fullname>
-      <email>$email</email>
-      <mobile>$mobile</mobile>
-      <address>$address</address>
-      <landmark>$landmark</landmark>
-      <pincode>$pincode</pincode>
-      <gst>$gst</gst>
-    </UpdateUserProfile>
-  </soap:Body>
-</soap:Envelope>
-''';
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: {
+          'id': id.toString(),
+          'fullname': fullname,
+          'email': email,
+          'mobile': mobile,
+          'address': address,
+          'landmark': landmark,
+          'pincode': pincode,
+          'gst': gst,
+        },
+      );
+
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Raw Response: ${response.body}');
+
+      // extract JSON from XML
+      final jsonString = response.body.replaceAll(RegExp(r'<[^>]*>'), '');
+
+      final data = jsonDecode(jsonString);
+
+      debugPrint(data['Status']); // Success
+      debugPrint(data['Message']); // Profile Updated
+    } catch (e) {
+      debugPrint('Error updating profile: $e');
+    }
+  }
+
+/// GET USER BY EMAIL OR MOBILE (GET)
+Future<Map<String, dynamic>> getUserByEmailOrMobile({
+  required String emailOrMobile,
+}) async {
+  final Uri url = Uri.parse('$_baseUrl/GetUserByEmailOrMobile').replace(
+    queryParameters: {
+      'value': emailOrMobile.trim(),
+    },
+  );
+   debugPrint('email or mobile:$emailOrMobile');
+
+  debugPrint('GetUser API URL: $url');
 
   try {
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'text/xml; charset=utf-8',
-        'SOAPAction': 'http://tempuri.org/UpdateUserProfile',
-      },
-      body: body,
-    );
+    final response = await http.get(url);
 
-    // print('Status Code: ${response.statusCode}');
-    print('Response Body:\n${response.body}\n');
+    if (response.statusCode != 200) {
+      return {
+        'success': false,
+        'message': 'Server error: ${response.statusCode}',
+      };
+    }
+
+    // Remove XML wrapper
+    final cleanJson =
+        response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+    debugPrint('GetUser response: $cleanJson');
+
+    final Map<String, dynamic> jsonData = jsonDecode(cleanJson);
+
+    final bool isSuccess =
+        jsonData['Status']?.toString().toLowerCase() == 'success';
+
+    return {
+      'success': isSuccess,
+      'message': jsonData['Message'],
+      'data': jsonData,
+    };
   } catch (e) {
-    print('Error updating profile: $e');
+    debugPrint('GetUser Error: $e');
+    return {
+      'success': false,
+      'message': 'Something went wrong',
+    };
   }
 }
+
+/// GET LIVE COPPER RATE
+Future<Map<String, dynamic>> getLiveCopperRate() async {
+  final Uri url = Uri.parse('$_baseUrl/GetLiveCopperFullRate');
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode != 200) {
+      return {'success': false, 'message': 'Server error: ${response.statusCode}'};
+    }
+
+    // Remove XML wrapper
+    final cleanJson = response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+    final Map<String, dynamic> data = jsonDecode(cleanJson);
+
+    return {'success': true, 'data': data};
+  } catch (e) {
+    debugPrint('LiveCopper Error: $e');
+    return {'success': false, 'message': 'Something went wrong'};
+  }
+}
+
 }

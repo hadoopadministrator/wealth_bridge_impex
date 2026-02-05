@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:wealth_bridge_impex/services/api_service.dart';
+import 'package:wealth_bridge_impex/services/auth_storage.dart';
+import 'package:wealth_bridge_impex/utils/app_colors.dart';
+import 'package:wealth_bridge_impex/utils/input_decoration.dart';
+import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 import 'package:wealth_bridge_impex/widgets/info_row.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -10,31 +14,28 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // final ApiService _apiService = ApiService();
-  bool isEditing = false;
+  final ApiService _apiService = ApiService();
 
-  // Controllers (API fields)
-  final TextEditingController fullNameController = TextEditingController(
-    text: 'John Doe',
-  );
-  final TextEditingController emailController = TextEditingController(
-    text: 'john@example.com',
-  );
-  final TextEditingController mobileController = TextEditingController(
-    text: '9876543210',
-  );
-  final TextEditingController addressController = TextEditingController(
-    text: 'Main Road, Mumbai',
-  );
-  final TextEditingController landmarkController = TextEditingController(
-    text: 'Near City Mall',
-  );
-  final TextEditingController pincodeController = TextEditingController(
-    text: '400001',
-  );
-  final TextEditingController gstController = TextEditingController(
-    text: '27ABCDE1234F1Z5',
-  );
+  bool isEditing = false;
+  bool _isLoading = false;
+
+  int? _userId;
+
+  // Controllers
+  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+  final TextEditingController landmarkController = TextEditingController();
+  final TextEditingController pincodeController = TextEditingController();
+  final TextEditingController gstController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
   @override
   void dispose() {
     fullNameController.dispose();
@@ -47,25 +48,106 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.dispose();
   }
 
-  void updateProfile() {
-    // Call Update Profile API here
-    // id, fullname, email, mobile, address, landmark, pincode, gst
+  // Load profile from API
+  Future<void> _loadProfile() async {
+    setState(() => _isLoading = true);
 
-    setState(() {
-      isEditing = false;
-    });
+    try {
+      final email = await AuthStorage.getEmail();
+      if (email == null) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profile updated successfully')),
-    );
+      final result = await _apiService.getUserByEmailOrMobile(
+        emailOrMobile: email,
+      );
+
+      if (result['success'] == true) {
+        final data = result['data'];
+
+        _userId = data['Id'];
+
+        fullNameController.text = data['FullName'] ?? '';
+        emailController.text = data['Email'] ?? '';
+        mobileController.text = data['Mobile'] ?? '';
+        addressController.text = data['Address'] ?? '';
+        landmarkController.text = data['Landmark'] ?? '';
+        pincodeController.text = data['Pincode'] ?? '';
+        gstController.text = data['Gst'] ?? '';
+      }
+    } catch (e) {
+      debugPrint('Profile load error: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      isDense: true,
-    );
+  // Update profile API
+  Future<void> _updateProfile() async {
+    if (_userId == null) return;
+    final fullName = fullNameController.text.trim();
+    final email = emailController.text.trim();
+    final mobile = mobileController.text.trim();
+    final address = addressController.text.trim();
+    final pincode = pincodeController.text.trim();
+    final gst = gstController.text.trim();
+    final landmark = landmarkController.text.trim();
+
+    // ---- validations (NO API CALL if any fails) ----
+    if (fullName.isEmpty) {
+      _showMessage('Full name is required');
+      return;
+    }
+
+    if (email.isEmpty) {
+      _showMessage('Email is required');
+      return;
+    }
+
+    if (mobile.isEmpty || mobile.length != 10) {
+      _showMessage('Enter valid 10 digit mobile number');
+      return;
+    }
+
+    if (address.isEmpty) {
+      _showMessage('Address is required');
+      return;
+    }
+
+    if (pincode.isEmpty || pincode.length != 6) {
+      _showMessage('Enter valid pincode');
+      return;
+    }
+
+    if (gst.isEmpty) {
+      _showMessage('GST number is required');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _apiService.updateUserProfile(
+        id: _userId!,
+        fullname: fullName,
+        email: email,
+        mobile: mobile,
+        address: address,
+        landmark: landmark, // can be empty
+        pincode: pincode,
+        gst: gst,
+      );
+
+      if (!mounted) return;
+
+      setState(() => isEditing = false);
+      _showMessage('Profile updated successfully');
+
+      await _loadProfile();
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Update failed');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   Widget _buildField({
@@ -74,14 +156,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required String value,
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
+    bool enabled = true,
   }) {
-    if (isEditing) {
+    if (isEditing && enabled) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: TextFormField(
           controller: controller,
           keyboardType: keyboardType,
-          decoration: _inputDecoration(label),
+          decoration: AppDecorations.textField(label: label),
         ),
       );
     }
@@ -94,8 +177,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _showMessage(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       backgroundColor: const Color(0xffF5F6FA),
       appBar: AppBar(
@@ -108,24 +198,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         actions: [
           IconButton(
-            // icon: Icon(isEditing ? Icons.close : Icons.edit),
-            icon: Icon(Icons.edit),
-            onPressed: ()   {
-               print('updating profile:');
-               final apiService = ApiService();
-               apiService.updateUserProfile(
-                id: 32,
-                fullname: 'AlexBen',
-                email: 'alex@gmail.com',
-                mobile: '7788445522',
-                address: 'address',
-                landmark: 'landmark',
-                pincode: '123456',
-                gst: '1234567890',
-              );
-              // setState(() {
-              //   isEditing = !isEditing;
-              // });
+            icon: Icon(isEditing ? Icons.close : Icons.edit),
+            onPressed: () {
+              setState(() {
+                isEditing = !isEditing;
+              });
             },
           ),
         ],
@@ -148,10 +225,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CircleAvatar(
                       radius: 48,
                       backgroundColor: Colors.amber.shade100,
-                      child: Icon(
-                        Icons.person,
-                        size: 48,
-                        color: const Color(0xffF9B236),
+                      child: Text(
+                        fullNameController.text.isNotEmpty
+                            ? fullNameController.text.trim()[0].toUpperCase()
+                            : '',
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xffF9B236),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -221,24 +303,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     if (isEditing) ...[
                       const SizedBox(height: 8),
-                      SizedBox(
+                      // AppColors.greenDark,
+                      CustomButton(
+                        text: 'Save Changes',
+                        backgroundColor: AppColors.orangeDark,
+                        foregroundColor: AppColors.white,
                         width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: updateProfile,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xffF9B236),
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 16.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
-                          child: const Text(
-                            'Save Changes',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
+                        onPressed: _updateProfile,
                       ),
+                      // SizedBox(
+                      //   width: double.infinity,
+                      //   child: ElevatedButton(
+                      //     onPressed: _updateProfile,
+                      //     style: ElevatedButton.styleFrom(
+                      //       backgroundColor: const Color(0xffF9B236),
+                      //       foregroundColor: Colors.black,
+                      //       padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      //       shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(8.0),
+                      //       ),
+                      //     ),
+                      //     child: const Text(
+                      //       'Save Changes',
+                      //       style: TextStyle(fontSize: 16),
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ],
                 ),
@@ -249,47 +339,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-
-// Future<void> onSaveProfile() async {
-//   try {
-//     showDialog(
-//       context: context,
-//       barrierDismissible: false,
-//       builder: (_) => const Center(child: CircularProgressIndicator()),
-//     );
-
-//     final result = await _apiService.updateUserProfile(
-//       id: 32,
-//       fullname: fullNameController.text,
-//       email: emailController.text,
-//       mobile: mobileController.text,
-//       address: addressController.text,
-//       landmark: landmarkController.text,
-//       pincode: pincodeController.text,
-//       gst: gstController.text,
-//     );
-
-//     if (!mounted) return;
-//     Navigator.pop(context);
-
-//     if (result['Status'] == 'Success') {
-//       setState(() => isEditing = false);
-
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(result['Message'])),
-//       );
-//     } else {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text(result['Message'])),
-//       );
-//     }
-//   } catch (e) {
-//     if (!mounted) return;
-//     Navigator.pop(context);
-
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       const SnackBar(content: Text('Unexpected error occurred')),
-//     );
-//   }
-// }
 }
