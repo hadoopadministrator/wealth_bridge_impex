@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wealth_bridge_impex/routes/app_routes.dart';
+import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 
 class PaymentScreen extends StatelessWidget {
   const PaymentScreen({super.key});
@@ -21,10 +22,10 @@ class PaymentScreen extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               /// ORDER SUMMARY
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.black,
@@ -74,22 +75,15 @@ class PaymentScreen extends StatelessWidget {
               const SizedBox(height: 30),
 
               /// PAY BUTTON
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
+              CustomButton(
+                width: double.infinity,
+                text: 'Pay ₹5050',
                 onPressed: () {
                   Navigator.pushReplacementNamed(
                     context,
                     AppRoutes.orderSuccess,
                   );
                 },
-                child: const Text("Pay ₹5050", style: TextStyle(fontSize: 18)),
               ),
             ],
           ),

@@ -20,8 +20,6 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isPaid = status.toLowerCase() == "paid";
-
     return Card(
       color: Colors.white,
       margin: const EdgeInsets.only(bottom: 16),
@@ -48,15 +46,13 @@ class OrderCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: isPaid
-                        ? Colors.green.withValues(alpha: 0.15)
-                        : Colors.orange.withValues(alpha: 0.15),
+                    color: Colors.orange.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     status,
                     style: TextStyle(
-                      color: isPaid ? Colors.green : Colors.orange,
+                      color: Colors.orange,
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                     ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wealth_bridge_impex/routes/app_routes.dart';
+import 'package:wealth_bridge_impex/utils/app_colors.dart';
 import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 
 class MyCartScreen extends StatefulWidget {
@@ -13,78 +15,62 @@ class _MyCartScreenState extends State<MyCartScreen> {
   final List<Map<String, dynamic>> _cartItems = [
     {
       'slab': '100 KG +',
-      'price': 1678.85,
-      'qty': 100,
+      'price': '₹ 1,678.85',
+      'qty': '100',
+      'amount': '₹ 1,678.85',
     },
     {
-      'slab': '50 - 100 KG',
-      'price': 1655.25,
-      'qty': 50,
+      'slab': '100 KG +',
+      'price': '₹ 1,678.85',
+      'qty': '100',
+      'amount': '₹ 1,678.85',
+    },
+    {
+      'slab': '100 KG +',
+      'price': '₹ 1,678.85',
+      'qty': '100',
+      'amount': '₹ 1,678.85',
+    },
+    {
+      'slab': '100 KG +',
+      'price': '₹ 1,678.85',
+      'qty': '100',
+      'amount': '₹ 1,678.85',
     },
   ];
-
-  // Increment quantity
-  void _incrementQty(int index) {
-    setState(() {
-      _cartItems[index]['qty']++;
-    });
-  }
-
-  // Decrement quantity
-  void _decrementQty(int index) {
-    if (_cartItems[index]['qty'] > 1) {
-      setState(() {
-        _cartItems[index]['qty']--;
-      });
-    }
-  }
-
-  // Remove item
-  void _removeItem(int index) {
-    setState(() {
-      _cartItems.removeAt(index);
-    });
-  }
-
-  // Calculate totals
-  int get totalQty =>
-      _cartItems.fold(0, (sum, item) => sum + item['qty'] as int);
-
-  double get grandTotal => _cartItems.fold(
-      0.0, (sum, item) => sum + item['qty'] * item['price']);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffF5F6FA),
       appBar: AppBar(
-        title: const Text('My Cart'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
         elevation: 0,
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
+        title: const Text(
+          'My Cart',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+        ),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _cartItems.isEmpty
-                ? const Center(child: Text('Your cart is empty'))
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: _cartItems.length,
-                    itemBuilder: (context, index) {
-                      final item = _cartItems[index];
-                      return Container(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+             // Container 1
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16.0),
+              itemCount: _cartItems.length,
+              itemBuilder: (context, index) {
+                final item = _cartItems[index];
+                return _cartItems.isEmpty
+                    ? const Center(child: Text('Your cart is empty'))
+                    : Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 4,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,66 +79,140 @@ class _MyCartScreenState extends State<MyCartScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  item['slab'],
+                                  'Slab: ${item['slab']}',
                                   style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                                IconButton(
-                                  onPressed: () => _removeItem(index),
-                                  icon: const Icon(Icons.close),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xffe8003e),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.close,
+                                      color: AppColors.white,
+                                      size: 22,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
-                            Text('Price: ₹ ${item['price'].toStringAsFixed(2)} / KG'),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Price: ${item['price']} / KG',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  'Amount: ${item['amount']}',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
                             Row(
                               children: [
-                                IconButton(
-                                  onPressed: () => _decrementQty(index),
-                                  icon: const Icon(Icons.remove),
+                                Text(
+                                  'Quantity(KG)',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                                Text(item['qty'].toString()),
-                                IconButton(
-                                  onPressed: () => _incrementQty(index),
-                                  icon: const Icon(Icons.add),
+                                const Spacer(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xff6c747e),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: IconButton(
+                                    // #6c747e #e8003e
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.remove,
+                                      color: AppColors.white,
+                                      size: 22,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  item['qty'],
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Color(0xff6c747e),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: const Icon(
+                                      Icons.add,
+                                      color: AppColors.white,
+                                      size: 22,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
-                            Text('Amount: ₹ ${(item['qty'] * item['price']).toStringAsFixed(2)}'),
                           ],
                         ),
                       );
+              },
+            ),
+           // Container 2
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Total Quantity: 150 KG',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Grand Total: ₹ 122321.000',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  CustomButton(
+                    width: double.infinity,
+                    text: 'Proceed to Checkout',
+                    onPressed: () {
+                      Navigator.pushNamed(context, AppRoutes.checkOut);
                     },
                   ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text('Total Quantity: $totalQty KG',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 4),
-                Text('Grand Total: ₹ ${grandTotal.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
-                const SizedBox(height: 12),
-                CustomButton(
-                  text: 'Proceed to Checkout',
-                  onPressed: () {
-                    // Navigate to checkout
-                  },
-                ),
-              ],
+                ],
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
-      backgroundColor: const Color(0xffF5F6FA),
     );
   }
 }

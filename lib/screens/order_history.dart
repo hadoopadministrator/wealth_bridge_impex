@@ -26,14 +26,7 @@ class _OrderHistoryState extends State<OrderHistory> {
       "total": "₹27,900",
       "status": "Paid",
     },
-    {
-      "date": "23/01/26",
-      "slab": "1.00 kg",
-      "type": "Sell",
-      "quantity": "1",
-      "total": "₹14,350",
-      "status": "Pending",
-    },
+    
     {
       "date": "24/01/26",
       "slab": "0.25 kg",

@@ -57,13 +57,13 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             title: const Text('Order History', style: TextStyle(fontSize: 18)),
             onTap: () {
               Navigator.pop(context); // close drawer
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Coming Soon!'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-              // Navigator.pushNamed(context, AppRoutes.orderHistory);
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   const SnackBar(
+              //     content: Text('Coming Soon!'),
+              //     duration: Duration(seconds: 2),
+              //   ),
+              // );
+              Navigator.pushNamed(context, AppRoutes.orderHistory);
             },
           ),
 

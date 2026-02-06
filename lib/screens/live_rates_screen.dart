@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:wealth_bridge_impex/routes/app_routes.dart';
 import 'package:wealth_bridge_impex/services/api_service.dart';
@@ -15,10 +17,11 @@ class LiveRatesScreen extends StatefulWidget {
 
 class _LiveRatesScreenState extends State<LiveRatesScreen> {
   final TextEditingController _qtyController = TextEditingController(text: '1');
-  int _quantity = 1000;
+  int _quantity = 10000;
   Map<String, dynamic>? _copperRate;
   bool _isLoading = true;
   final apiService = ApiService();
+  Timer? _fetchTimer;
 
   Future<void> _fetchLiveRates() async {
     setState(() => _isLoading = true);
@@ -39,6 +42,13 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
     }
   }
 
+  void _startAutoFetch() {
+    _fetchTimer?.cancel();
+    _fetchTimer = Timer.periodic(const Duration(seconds: 60), (_) {
+      _fetchLiveRates();
+    });
+  }
+
   void _incrementQty() {
     setState(() {
       _quantity++;
@@ -57,11 +67,13 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchLiveRates();
+    _fetchLiveRates(); // initial fetch
+    _startAutoFetch(); // periodic fetch
   }
 
   @override
   void dispose() {
+    _fetchTimer?.cancel();
     _qtyController.dispose();
     super.dispose();
   }
@@ -113,28 +125,16 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  const Text(
-                                    "COPPER PRICE",
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    "(${slab['SlabName']})",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
+                              const Text(
+                                "COPPER PRICE",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
-                              const SizedBox(height: 10),
                               Row(
                                 children: [
                                   Text(
