@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wealth_bridge_impex/screens/about_us_screen.dart';
-import 'package:wealth_bridge_impex/screens/check_out_screen.dart';
+import 'package:wealth_bridge_impex/screens/by_checkout_screen.dart';
 import 'package:wealth_bridge_impex/screens/contact_us_screen.dart';
 import 'package:wealth_bridge_impex/screens/forgot_password_screen.dart';
 import 'package:wealth_bridge_impex/screens/live_rates_screen.dart';
@@ -40,7 +40,7 @@ class AppRoutes {
     contactUs: (context) => const ContactUsScreen(),
     aboutUs: (context) => const AboutUsScreen(),
     orderHistory: (context) => const OrderHistory(),
-    checkOut: (context) => const CheckOutScreen(),
+    checkOut: (context) => const ByCheckoutScreen(),
     payment: (context) => const PaymentScreen(),
     orderSuccess: (context) => const OrderSuccessScreen(),
     profile: (context) => const ProfileScreen(),

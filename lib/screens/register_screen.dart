@@ -200,6 +200,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration: AppDecorations.textField(
                           label: 'Landmark (optional)',
                         ),
+                        validator: (value) {
+                          if (value != null && value.trim().length > 100) {
+                            return 'Landmark too long';
+                          }
+                          return null;
+                        },
                       ),
                       const SizedBox(height: 20),
 
@@ -227,15 +233,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       TextFormField(
                         controller: _gstController,
                         textInputAction: TextInputAction.done,
+                        textCapitalization: TextCapitalization.characters,
                         decoration: AppDecorations.textField(
-                          label: 'GST Number',
+                          label: 'GST Number (optional)',
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'GST Number is required';
-                          }
-                          if (value.trim().length < 10) {
-                            return 'Invalid GST number';
+                          final gst = value?.trim().toUpperCase();
+
+                          if (gst == null || gst.isEmpty) return null;
+
+                          final gstRegex = RegExp(
+                            r'^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$',
+                          );
+
+                          if (!gstRegex.hasMatch(gst)) {
+                            return 'Enter valid GST number';
                           }
                           return null;
                         },

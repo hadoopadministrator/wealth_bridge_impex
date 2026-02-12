@@ -29,8 +29,10 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
 
   // ---------------- API ----------------
 
-  Future<void> _fetchLiveRates() async {
-    setState(() => _isLoading = true);
+  Future<void> _fetchLiveRates({bool showLoader = false}) async {
+    if (showLoader) {
+      setState(() => _isLoading = true);
+    }
 
     final result = await apiService.getLiveCopperRate();
 
@@ -51,7 +53,7 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
   void _startAutoFetch() {
     _fetchTimer?.cancel();
     _fetchTimer = Timer.periodic(
-      const Duration(seconds: 5),
+      const Duration(seconds: 5000),
       (_) => _fetchLiveRates(),
     );
   }
@@ -173,7 +175,14 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: AppColors.black,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,21 +196,37 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                             ),
                           ),
                           Row(
+                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Buy: ₹ ${slab['BuyPrice']}',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                              Expanded(
+                                child: Text(
+                                  'Buy: ₹ ${slab['BuyPrice']}',
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.white,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              Text(
-                                'Qty: $slabName',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey,
+                              Expanded(
+                                child: Text(
+                                  'Sell: ₹ ${slab['SellPrice']}',
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Qty: $slabName',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.white,
+                                  ),
                                 ),
                               ),
                             ],
@@ -209,40 +234,66 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                           const SizedBox(height: 10),
                           Row(
                             children: [
-                              CustomButton(
-                                text: 'BUY',
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
+                              Expanded(
+                                child: CustomButton(
+                                  text: 'BUY',
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  onPressed: () async {
+                                    final navigator = Navigator.of(context);
+                                    final messenger = ScaffoldMessenger.of(
+                                      context,
+                                    );
+                                    bool added = await _addToCart(
+                                      index: index,
+                                      slab: slab,
+                                      slabName: slabName,
+                                    );
+                                    if (!mounted) return;
+                                    messenger.showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          added
+                                              ? 'Added to cart'
+                                              : 'Please select quantity',
+                                        ),
+                                      ),
+                                    );
+                                    if (added) {
+                                      navigator.pushNamed(AppRoutes.cart);
+                                    }
+                                  },
                                 ),
-                                onPressed: () async {
-                                  await _addToCart(
-                                    index: index,
-                                    slab: slab,
-                                    slabName: slabName,
-                                    showSnack: false,
-                                  );
-                                  Navigator.pushNamed(
-                                    context,
-                                    AppRoutes.checkOut,
-                                  );
-                                },
                               ),
                               const SizedBox(width: 10),
-                              CustomButton(
-                                text: 'ADD TO CART',
-                                backgroundColor: AppColors.greenDark,
-                                foregroundColor: AppColors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                  horizontal: 14,
+                              Expanded(
+                                child: CustomButton(
+                                  text: 'SELL',
+                                  backgroundColor: AppColors.greenDark,
+                                  foregroundColor: AppColors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 14,
+                                  ),
+                                  onPressed: () {
+                                    final messenger = ScaffoldMessenger.of(
+                                      context,
+                                    );
+                                    messenger.showSnackBar(
+                                      SnackBar(
+                                        content: Text('This Feature is Coming Soon...'),
+                                      ),
+                                    );
+                                    // final navigator = Navigator.of(context);
+                                    // await _addToCart(
+                                    //   index: index,
+                                    //   slab: slab,
+                                    //   slabName: slabName,
+                                    // );
+                                    // navigator.pushNamed(AppRoutes.cart);
+                                  },
                                 ),
-                                onPressed: () async {
-                                  await _addToCart(
-                                    index: index,
-                                    slab: slab,
-                                    slabName: slabName,
-                                  );
-                                },
                               ),
                               const SizedBox(width: 10),
                               Expanded(
@@ -301,72 +352,55 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
     );
   }
 
-  Future<void> _addToCart({
+  Future<bool> _addToCart({
     required int index,
     required Map slab,
     required String slabName,
-    bool showSnack = true,
   }) async {
     final int unitQty = _quantities[index] ?? 0;
 
     if (unitQty <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Please select quantity')));
-      return;
+      return false;
     }
 
-    // double kgPerUnit = 1.0;
-    // if (slabName.startsWith('0.25')) {
-    //   kgPerUnit = 0.25;
-    // } else if (slabName.startsWith('0.5')) {
-    //   kgPerUnit = 0.5;
-    // }
+    try {
+      final double totalKg = unitQty.toDouble();
+      final double buyPrice = double.parse(slab['BuyPrice'].toString());
+      final double sellPrice = double.parse(slab['SellPrice'].toString());
 
-    // final double totalKg = unitQty * kgPerUnit;
-    // final double buyPrice = double.parse(slab['BuyPrice'].toString());
+      final int slabId = slab['Id'];
 
-    final double totalKg = unitQty.toDouble();
-    final double buyPrice = double.parse(slab['BuyPrice'].toString());
-    final int slabId = slab['Id'];
-
-    final cartItem = CartItemModel(
-      slabId: slabId,
-      slab: slabName,
-      price: buyPrice,
-      qty: totalKg,
-      amount: buyPrice * totalKg,
-      createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
-    );
-    // DEBUG PRINT START
-    // debugPrint('------------ ADD TO CART DEBUG ------------');
-    // debugPrint('Slab ID: $slabId');
-    // debugPrint('Slab Name: $slabName');
-    // debugPrint('Unit Qty: $unitQty');
-    // debugPrint('Total KG: $totalKg');
-    // debugPrint('Buy Price: $buyPrice');
-    // debugPrint('Final Amount: ${buyPrice * totalKg}');
-    // debugPrint('Cart Map: ${cartItem.toMap()}');
-    // debugPrint('-------------------------------------------');
-    // DEBUG PRINT END
-
-    final messenger = ScaffoldMessenger.of(context);
-
-    await CartDatabaseService.instance.insertOrUpdate(cartItem);
-
-    
-    // final items = await CartDatabaseService.instance.getCartItems();
-
-    // debugPrint('---- FULL CART AFTER INSERT ----');
-    // for (var item in items) {
-    //   debugPrint(item.toMap().toString());
-    // }
-    // debugPrint('--------------------------------');
-
-    if (!mounted) return;
-
-    if (showSnack) {
-      messenger.showSnackBar(const SnackBar(content: Text('Added to cart')));
+      final cartItem = CartItemModel(
+        slabId: slabId,
+        slab: slabName,
+        buyPrice: buyPrice,
+        sellPrice: sellPrice,
+        qty: totalKg,
+        amount: buyPrice * totalKg,
+        createdAt: DateFormat('yyyy-MM-dd HH:mm:ss').format(DateTime.now()),
+      );
+      // DEBUG PRINT START
+      // debugPrint('------------ ADD TO CART DEBUG ------------');
+      // debugPrint('Slab ID: $slabId');
+      // debugPrint('Slab Name: $slabName');
+      // debugPrint('Unit Qty: $unitQty');
+      // debugPrint('Total KG: $totalKg');
+      // debugPrint('Buy Price: $buyPrice');
+      // debugPrint('Final Amount: ${buyPrice * totalKg}');
+      // debugPrint('Cart Map: ${cartItem.toMap()}');
+      // debugPrint('-------------------------------------------');
+      // DEBUG PRINT END
+      await CartDatabaseService.instance.insertOrUpdate(cartItem);
+      // final items = await CartDatabaseService.instance.getCartItems();
+      // debugPrint('---- FULL CART AFTER INSERT ----');
+      // for (var item in items) {
+      //   debugPrint(item.toMap().toString());
+      // }
+      // debugPrint('--------------------------------');
+      return true;
+    } catch (e) {
+      // debugPrint('Add to cart error: $e');
+      return false;
     }
   }
 }

@@ -36,14 +36,14 @@ class _MyCartScreenState extends State<MyCartScreen> {
   // ---------------- ACTIONS ----------------
   Future<void> _increaseQty(CartItemModel item) async {
     final newQty = item.qty + 1;
-    await _db.updateQty(item.id!, newQty, item.price);
+    await _db.updateQty(item.id!, newQty,);
     _loadCart();
   }
   Future<void> _decreaseQty(CartItemModel item) async {
     if (item.qty <= 1) return;
 
     final newQty = item.qty - 1;
-    await _db.updateQty(item.id!, newQty, item.price);
+    await _db.updateQty(item.id!, newQty,);
     _loadCart();
   }
   Future<void> _removeItem(int id) async {
@@ -126,7 +126,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Price: ₹ ${item.price.toStringAsFixed(2)} / KG',
+                                  'Price: ₹ ${item.buyPrice.toStringAsFixed(2)} / KG',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

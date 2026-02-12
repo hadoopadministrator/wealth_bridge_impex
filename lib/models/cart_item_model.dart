@@ -2,7 +2,8 @@ class CartItemModel {
   final int? id;
   final int slabId;
   final String slab;
-  final double price;
+ final double buyPrice;    // renamed from price for clarity
+  final double sellPrice;   // new field
   final double qty;
   final double amount;
   final String createdAt;
@@ -11,7 +12,8 @@ class CartItemModel {
     this.id,
     required this.slabId,
     required this.slab,
-    required this.price,
+    required this.buyPrice,
+    required this.sellPrice,  // new
     required this.qty,
     required this.amount,
     required this.createdAt,
@@ -23,7 +25,8 @@ class CartItemModel {
       id: map['id'] as int?,
        slabId: map['slabId'] as int,
       slab: map['slab'] as String,
-      price: (map['price'] as num).toDouble(),
+       buyPrice: (map['buyPrice'] as num).toDouble(),
+      sellPrice: (map['sellPrice'] as num).toDouble(),  // new
       qty: (map['qty'] as num).toDouble(),
       amount: (map['amount'] as num).toDouble(),
       createdAt: map['createdAt'] as String,
@@ -36,7 +39,8 @@ class CartItemModel {
       'id': id,
       'slabId': slabId,
       'slab': slab,
-      'price': price,
+      'buyPrice': buyPrice,
+      'sellPrice': sellPrice,  // new
       'qty': qty,
       'amount': amount,
       'createdAt': createdAt,
@@ -53,9 +57,10 @@ class CartItemModel {
      id: id ?? this.id,
       slabId: slabId,
       slab: slab,
-      price: price,
+      buyPrice: buyPrice,
+      sellPrice: sellPrice,
       qty: newQty,
-      amount: price * newQty,
+      amount:buyPrice * newQty,
       createdAt: createdAt,
     );
   }

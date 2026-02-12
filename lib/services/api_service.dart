@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -32,7 +32,7 @@ class ApiService {
 
     final Uri url = Uri.parse('$_baseUrl/RegisterUser?$queryString');
 
-    debugPrint('Register API URL: $url');
+    // debugPrint('Register API URL: $url');
 
     try {
       final response = await http.get(url);
@@ -60,7 +60,7 @@ class ApiService {
 
       return {'success': isSuccess, 'message': message};
     } catch (e) {
-      debugPrint('Register Error: $e');
+      // debugPrint('Register Error: $e');
       return {'success': false, 'message': 'Something went wrong'};
     }
   }
@@ -133,18 +133,18 @@ class ApiService {
         },
       );
 
-      debugPrint('Status Code: ${response.statusCode}');
-      debugPrint('Raw Response: ${response.body}');
+      // debugPrint('Status Code: ${response.statusCode}');
+      // debugPrint('Raw Response: ${response.body}');
 
       // extract JSON from XML
       final jsonString = response.body.replaceAll(RegExp(r'<[^>]*>'), '');
 
-      final data = jsonDecode(jsonString);
-
-      debugPrint(data['Status']); // Success
-      debugPrint(data['Message']); // Profile Updated
+      // final data = jsonDecode(jsonString);
+      jsonDecode(jsonString);
+      // debugPrint(data['Status']); // Success
+      // debugPrint(data['Message']); // Profile Updated
     } catch (e) {
-      debugPrint('Error updating profile: $e');
+      // debugPrint('Error updating profile: $e');
     }
   }
 
@@ -157,9 +157,9 @@ Future<Map<String, dynamic>> getUserByEmailOrMobile({
       'value': emailOrMobile.trim(),
     },
   );
-   debugPrint('email or mobile:$emailOrMobile');
+  //  debugPrint('email or mobile:$emailOrMobile');
 
-  debugPrint('GetUser API URL: $url');
+  // debugPrint('GetUser API URL: $url');
 
   try {
     final response = await http.get(url);
@@ -175,7 +175,7 @@ Future<Map<String, dynamic>> getUserByEmailOrMobile({
     final cleanJson =
         response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
 
-    debugPrint('GetUser response: $cleanJson');
+    // debugPrint('GetUser response: $cleanJson');
 
     final Map<String, dynamic> jsonData = jsonDecode(cleanJson);
 
@@ -188,7 +188,7 @@ Future<Map<String, dynamic>> getUserByEmailOrMobile({
       'data': jsonData,
     };
   } catch (e) {
-    debugPrint('GetUser Error: $e');
+    // debugPrint('GetUser Error: $e');
     return {
       'success': false,
       'message': 'Something went wrong',
@@ -211,11 +211,11 @@ Future<Map<String, dynamic>> getLiveCopperRate() async {
     final cleanJson = response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
 
     final Map<String, dynamic> data = jsonDecode(cleanJson);
-        debugPrint('LiveCopper Rates: $data');
+        // debugPrint('LiveCopper Rates: $data');
 
     return {'success': true, 'data': data};
   } catch (e) {
-    debugPrint('LiveCopper Error: $e');
+    // debugPrint('LiveCopper Error: $e');
     return {'success': false, 'message': 'Something went wrong'};
   }
 }

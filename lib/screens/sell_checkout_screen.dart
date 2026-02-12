@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/services/cart_database_service.dart';
-import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 import 'package:wealth_bridge_impex/models/cart_item_model.dart';
+import 'package:wealth_bridge_impex/services/cart_database_service.dart';
+import 'package:wealth_bridge_impex/services/payment_service.dart';
+import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 
-class CheckOutScreen extends StatefulWidget {
-  const CheckOutScreen({super.key});
+class SellCheckoutScreen extends StatefulWidget {
+  const SellCheckoutScreen({super.key});
 
   @override
-  State<CheckOutScreen> createState() => _CheckOutScreenState();
+  State<SellCheckoutScreen> createState() => _SellCheckoutScreenState();
 }
 
-class _CheckOutScreenState extends State<CheckOutScreen> {
-  // late TextEditingController _qtyController;
-  // late int _quantity;
+class _SellCheckoutScreenState extends State<SellCheckoutScreen> {
+
+  final PaymentService paymentService = PaymentService();
 
   List<CartItemModel> cartItems = [];
   bool _loading = true;
@@ -29,6 +29,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
   void initState() {
     super.initState();
     _loadCart();
+     paymentService.initPayment();
   }
 
   Future<void> _loadCart() async {
@@ -39,37 +40,12 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
     });
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-
-  //   if (!_initialized) {
-  //     final args = ModalRoute.of(context)?.settings.arguments;
-  //     if (args is CartItemModel) {
-  //       cartItem = args;
-  //       _quantity = cartItem.qty.toInt();
-  //     } else {
-  //       // fallback if argument missing
-  //       cartItem = CartItemModel(
-  //         slab: 'Unknown',
-  //         price: 0,
-  //         qty: 1,
-  //         amount: 0,
-  //         createdAt: DateTime.now().toString(),
-  //       );
-  //       _quantity = 1;
-  //     }
-  //     _qtyController = TextEditingController(text: _quantity.toString());
-  //     _initialized = true;
-  //   }
-  // }
 
   // ---------------- calculations ----------------
 
   double get totalQty => cartItems.fold(0, (sum, e) => sum + e.qty);
 
-  /// combined price of all slabs
-  double get totalPrice => cartItems.fold(0, (sum, e) => sum + e.price);
+  double get totalPrice => cartItems.fold(0, (sum, e) => sum + e.buyPrice);
 
   double get subTotal => cartItems.fold(0, (sum, e) => sum + e.amount);
 
@@ -91,36 +67,15 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         return Icons.local_shipping;
     }
   }
-
-  // void _incrementQty() {
-  //   setState(() {
-  //     _quantity++;
-  //     _qtyController.text = _quantity.toString();
-  //   });
-  // }
-
-  // void _decrementQty() {
-  //   if (_quantity <= 1) return;
-  //   setState(() {
-  //     _quantity--;
-  //     _qtyController.text = _quantity.toString();
-  //   });
-  // }
-
-  // @override
-  // void dispose() {
-  //   _qtyController.dispose();
-  //   super.dispose();
-  // }
-
-  // double get subTotal => cartItem.price * _quantity;
-  // double get gst => subTotal * 0.18; // 18% GST
-  // double get courierCharges => 250; // fixed for now
-  // double get finalTotal => subTotal + gst + courierCharges;
+  @override
+  void dispose() {
+    paymentService.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
+   if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return Scaffold(
@@ -146,7 +101,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 value: 'CART ITEMS',
               ),
               const SizedBox(height: 24),
-              SummaryRowCard(label: 'Order Type', value: 'BUY'),
+              SummaryRowCard(label: 'Order Type', value: 'SELL'),
               const SizedBox(height: 24),
               SummaryRowCard(
                 label: 'Price',
@@ -157,53 +112,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 label: 'Quantity (KG)',
                 value: totalQty.toStringAsFixed(2),
               ),
-              // const Text(
-              //   "Quantity (KG)",
-              //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              // ),
-              // const SizedBox(height: 8),
-              // Container(
-              //   width: double.infinity,
-              //   padding: const EdgeInsets.all(14),
-              //   decoration: BoxDecoration(
-              //     color: const Color(0xfff8f9fa),
-              //     borderRadius: BorderRadius.circular(8),
-              //     border: Border.all(color: Colors.grey, width: 1),
-              //   ),
-              //   child: Text(
-              //     totalQty.toStringAsFixed(2),
-              //     style: const TextStyle(fontSize: 16),
-              //   ),
-              // ),
-
-              // TextField(
-              //   controller: _qtyController,
-              //   keyboardType: TextInputType.number,
-              //   cursorColor: Colors.black,
-              //   textInputAction: TextInputAction.done,
-              //   decoration: AppDecorations.textField(
-              //     label: '',
-              //     suffixIcon: Column(
-              //       mainAxisAlignment: MainAxisAlignment.center,
-              //       children: [
-              //         InkWell(
-              //           onTap: _incrementQty,
-              //           child: const Icon(Icons.keyboard_arrow_up, size: 22),
-              //         ),
-              //         InkWell(
-              //           onTap: _decrementQty,
-              //           child: const Icon(Icons.keyboard_arrow_down, size: 22),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              //   onChanged: (value) {
-              //     final parsed = int.tryParse(value);
-              //     if (parsed != null && parsed > 0) {
-              //       setState(() => _quantity = parsed);
-              //     }
-              //   },
-              // ),
+              
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -277,7 +186,8 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                 width: double.infinity,
                 text: 'Confirm Checkout',
                 onPressed: () {
-                  Navigator.pushNamed(context, AppRoutes.payment);
+                   paymentService.openCheckout(500);
+                  // Navigator.pushNamed(context, AppRoutes.orderSuccess);
                 },
               ),
             ],
@@ -285,9 +195,9 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
         ),
       ),
     );
+
   }
 }
-
 class SummaryRowCard extends StatelessWidget {
   final String label;
   final String value;

@@ -27,7 +27,8 @@ class CartDatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         slabId INTEGER NOT NULL,
         slab TEXT NOT NULL,
-        price REAL NOT NULL,
+        buyPrice REAL NOT NULL,
+        sellPrice REAL NOT NULL,
         qty REAL NOT NULL,
         amount REAL NOT NULL,
         createdAt TEXT NOT NULL
@@ -75,15 +76,26 @@ class CartDatabaseService {
   }
 
   /// Update quantity directly
-  Future<void> updateQty(int id, double qty, double price) async {
+  Future<void> updateQty(int id, double qty) async {
     final db = await database;
 
-    await db.update(
-      'cart_items',
-      {'qty': qty, 'amount': qty * price},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+     final item = (await db.query(
+    'cart_items',
+    where: 'id = ?',
+    whereArgs: [id],
+  )).first;
+
+  final buyPrice = (item['buyPrice'] as num).toDouble();
+
+  await db.update(
+    'cart_items',
+    {
+      'qty': qty,
+      'amount': qty * buyPrice,
+    },
+    where: 'id = ?',
+    whereArgs: [id],
+  );
   }
 
   /// Remove single item
