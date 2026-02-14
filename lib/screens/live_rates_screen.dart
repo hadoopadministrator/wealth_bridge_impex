@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wealth_bridge_impex/routes/app_routes.dart';
 import 'package:wealth_bridge_impex/services/api_service.dart';
+import 'package:wealth_bridge_impex/services/auth_storage.dart';
 import 'package:wealth_bridge_impex/services/cart_database_service.dart';
 import 'package:wealth_bridge_impex/models/cart_item_model.dart';
 import 'package:wealth_bridge_impex/utils/app_colors.dart';
@@ -26,11 +27,13 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
 
   final ApiService apiService = ApiService();
   Timer? _fetchTimer;
+  // DateTime? _lastUpdated;
 
   // ---------------- API ----------------
 
   Future<void> _fetchLiveRates({bool showLoader = false}) async {
-    if (showLoader) {
+    debugPrint("LiveRates API called at: ${DateTime.now().toString()}");
+    if (showLoader && mounted) {
       setState(() => _isLoading = true);
     }
 
@@ -40,6 +43,7 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
       setState(() {
         _copperRate = result['data'];
         _isLoading = false;
+        // _lastUpdated = DateTime.now();
       });
     } else {
       setState(() => _isLoading = false);
@@ -52,10 +56,10 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
 
   void _startAutoFetch() {
     _fetchTimer?.cancel();
-    _fetchTimer = Timer.periodic(
-      const Duration(seconds: 5000),
-      (_) => _fetchLiveRates(),
-    );
+    _fetchTimer = Timer.periodic(const Duration(seconds: 300), (_) {
+      debugPrint("Timer triggered at: ${DateTime.now()}");
+      _fetchLiveRates();
+    });
   }
 
   // ---------------- Quantity helpers ----------------
@@ -108,7 +112,7 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchLiveRates();
+    _fetchLiveRates(showLoader: true);
     _startAutoFetch();
   }
 
@@ -126,11 +130,11 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F6FA),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: AppColors.white,
+        iconTheme: const IconThemeData(color: AppColors.black),
         title: const Text(
           'Live Prices',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
@@ -157,19 +161,16 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                   itemBuilder: (context, index) {
                     final slab = _copperRate!['Slabs'][index];
                     final slabName = slab['SlabName'];
-
                     // Get min/max using helper
                     final limits = getQtyLimitsFromSlab(slabName);
                     final minQty = limits.min;
                     final maxQty = limits.max;
-
                     _qtyControllers.putIfAbsent(index, () {
                       _quantities[index] ??= minQty;
                       return TextEditingController(
                         text: _quantities[index].toString(),
                       );
                     });
-
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
                       padding: const EdgeInsets.all(16),
@@ -195,8 +196,11 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                               color: Colors.white,
                             ),
                           ),
+                          // Text(
+                          //   "Last Updated: ${_lastUpdated != null ? DateFormat('HH:mm:ss').format(_lastUpdated!) : '--'}",
+                          //   style: TextStyle(color: Colors.white),
+                          // ),
                           Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
                                 child: Text(
@@ -282,7 +286,9 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                                     );
                                     messenger.showSnackBar(
                                       SnackBar(
-                                        content: Text('This Feature is Coming Soon...'),
+                                        content: Text(
+                                          'This Feature is Coming Soon...',
+                                        ),
                                       ),
                                     );
                                     // final navigator = Navigator.of(context);
@@ -364,11 +370,33 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
     }
 
     try {
+      final limits = getQtyLimitsFromSlab(slabName);
+      final minQty = limits.min;
+      final maxQty = limits.max;
+
       final double totalKg = unitQty.toDouble();
       final double buyPrice = double.parse(slab['BuyPrice'].toString());
       final double sellPrice = double.parse(slab['SellPrice'].toString());
 
       final int slabId = slab['Id'];
+      final userId = await AuthStorage.getUserId();
+      if (userId == null) {
+        return false;
+      }
+
+      /// ADD TO CART API
+      final apiResult = await apiService.addToCart(
+        userId: userId,
+        slabName: slabName,
+        pricePerKg: buyPrice,
+        qty: unitQty,
+        minWeight: minQty,
+        maxWeight: maxQty ?? unitQty,
+      );
+      debugPrint("ADD TO CART API RESULT: $apiResult");
+      if (apiResult['success'] != true) {
+        return false;
+      }
 
       final cartItem = CartItemModel(
         slabId: slabId,
