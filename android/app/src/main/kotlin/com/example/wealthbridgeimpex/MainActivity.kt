@@ -1,4 +1,4 @@
-package com.example.wealth_bridge_impex
+package com.infisoft.wealthbridgeimpex
 
 import io.flutter.embedding.android.FlutterActivity
 

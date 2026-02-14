@@ -88,6 +88,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                       const SizedBox(height: 24),
                       CustomButton(
+                        width: double.infinity,
                         text: 'Send Reset Link',
                         onPressed: () {
                           if (!_formKey.currentState!.validate()) return;

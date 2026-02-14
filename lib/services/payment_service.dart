@@ -2,32 +2,32 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentService {
   late Razorpay _razorpay;
-  // Function()? onPaymentSuccessCallback;
-  // Function(String message)? onPaymentErrorCallback;
-  void initPayment(
-    //   {
-    //   required Function() onSuccess,
-    //   required Function(String message) onError,
-    // }
-  ) {
+
+  Function(String paymentId)? onPaymentSuccessCallback;
+  Function(String message)? onPaymentErrorCallback;
+  // INIT
+  void initPayment({
+    required Function(String paymentId) onSuccess,
+    required Function(String message) onError,
+  }) {
     _razorpay = Razorpay();
-    // onPaymentSuccessCallback = onSuccess;
-    // onPaymentErrorCallback = onError;
+    onPaymentSuccessCallback = onSuccess;
+    onPaymentErrorCallback = onError;
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
 
+  // OPEN CHECKOUT
   void openCheckout({
     required double amount,
     required String email,
     required String contact,
-    // required String orderId,
   }) {
     var options = {
-      'key': 'rzp_live_S4YU2wG1qoN7Cl', // rzp_test_xxxxxxxxx
+      'key': 'rzp_live_S4YU2wG1qoN7Cl',
       'amount': (amount * 100).toInt(),
-      'name': 'Wealth Bridge Impex', // SattvikPlate
+      'name': 'Wealth Bridge Impex',
       'description': 'Copper Order Payment',
       'prefill': {'contact': contact, 'email': email},
       'external': {
@@ -38,25 +38,26 @@ class PaymentService {
     try {
       _razorpay.open(options);
     } catch (e) {
-      // onPaymentErrorCallback?.call("Payment initialization failed");
+      onPaymentErrorCallback?.call("Payment initialization failed");
       // print("Error--------------------: $e");
     }
   }
 
+  // SUCCESS
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    // print("SUCCESS----------: ${response.paymentId}");
-    // Send all values to backend for verification
-    // verifyPaymentFromServer(
-    //   paymentId: response.paymentId,
-    //   orderId: response.orderId,
-    //   signature: response.signature,
-    // );
-    verifyPaymentFromServer(response.paymentId);
+    final paymentId = response.paymentId ?? '';
+
+    if (paymentId.isEmpty) {
+      onPaymentErrorCallback?.call("Invalid payment response");
+
+      return;
+    }
+    onPaymentSuccessCallback?.call(paymentId);
   }
 
+  // ERROR
   void _handlePaymentError(PaymentFailureResponse response) {
-    // onPaymentErrorCallback?.call(
-    //     response.message ?? "Payment failed");
+    onPaymentErrorCallback?.call(response.message ?? "Payment failed");
     // print("ERROR: ${response.code} - ${response.message}");
   }
 
@@ -65,24 +66,24 @@ class PaymentService {
   }
 
   void dispose() {
-    _razorpay.clear();
+    try {
+      _razorpay.clear();
+    } catch (_) {}
   }
 
-  void verifyPaymentFromServer(
-  //   {
+  // void verifyPaymentFromServer({
   //   String? paymentId,
   //   String? orderId,
   //   String? signature,
-  // }
-    String? paymentId) {
-    //   if (paymentId == null || orderId == null || signature == null) {
-    //   onPaymentErrorCallback?.call("Invalid payment response");
-    //   return;
-    // }
-    // TODO: Call your backend API
-    // Send paymentId, orderId, signature
-    // Backend must verify using Razorpay secret
+  //   // String? paymentId,
+  // }) {
+  //   if (paymentId == null || orderId == null || signature == null) {
+  //     onPaymentErrorCallback?.call("Invalid payment response");
+  //     return;
+  //   }
+  //   // Send paymentId, orderId, signature
+  //   // Backend must verify using Razorpay secret
 
-    // onPaymentSuccessCallback?.call();
-  }
+  //   // onPaymentSuccessCallback?.call();
+  // }
 }

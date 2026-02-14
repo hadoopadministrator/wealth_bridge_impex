@@ -280,24 +280,24 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                                     vertical: 12,
                                     horizontal: 14,
                                   ),
-                                  onPressed: () {
-                                    final messenger = ScaffoldMessenger.of(
-                                      context,
-                                    );
-                                    messenger.showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'This Feature is Coming Soon...',
-                                        ),
-                                      ),
-                                    );
-                                    // final navigator = Navigator.of(context);
-                                    // await _addToCart(
-                                    //   index: index,
-                                    //   slab: slab,
-                                    //   slabName: slabName,
+                                  onPressed: () async {
+                                    // final messenger = ScaffoldMessenger.of(
+                                    //   context,
                                     // );
-                                    // navigator.pushNamed(AppRoutes.cart);
+                                    // messenger.showSnackBar(
+                                    //   SnackBar(
+                                    //     content: Text(
+                                    //       'This Feature is Coming Soon...',
+                                    //     ),
+                                    //   ),
+                                    // );
+                                    final navigator = Navigator.of(context);
+                                    await _addToCart(
+                                      index: index,
+                                      slab: slab,
+                                      slabName: slabName,
+                                    );
+                                    navigator.pushNamed(AppRoutes.sellCheckOut);
                                   },
                                 ),
                               ),

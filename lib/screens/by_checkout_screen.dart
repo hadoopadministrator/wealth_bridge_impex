@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wealth_bridge_impex/routes/app_routes.dart';
+import 'package:wealth_bridge_impex/services/api_service.dart';
 import 'package:wealth_bridge_impex/services/auth_storage.dart';
 import 'package:wealth_bridge_impex/services/cart_database_service.dart';
 import 'package:wealth_bridge_impex/services/payment_service.dart';
@@ -14,9 +16,8 @@ class ByCheckoutScreen extends StatefulWidget {
 }
 
 class _ByCheckoutScreenState extends State<ByCheckoutScreen> {
-  
   final PaymentService paymentService = PaymentService();
-
+  final ApiService apiService = ApiService();
   List<CartItemModel> cartItems = [];
   bool _loading = true;
 
@@ -36,7 +37,16 @@ class _ByCheckoutScreenState extends State<ByCheckoutScreen> {
     super.initState();
     _loadUser();
     _loadCart();
-    paymentService.initPayment();
+    paymentService.initPayment(
+      onSuccess: (paymentId) {
+        _placeOrder(paymentId);
+      },
+      onError: (message) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+      },
+    );
   }
 
   Future<void> _loadUser() async {
@@ -87,14 +97,11 @@ class _ByCheckoutScreenState extends State<ByCheckoutScreen> {
     }
   }
 
-  
-
   @override
   void dispose() {
     paymentService.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -229,5 +236,44 @@ class _ByCheckoutScreenState extends State<ByCheckoutScreen> {
       ),
     );
   }
-}
 
+  // ---------------- PLACE ORDER API ----------------
+
+  Future<void> _placeOrder(String razorpayPaymentId) async {
+    if (userId == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("User ID not found")));
+      return;
+    }
+
+    final result = await apiService.placeOrderFromCart(
+      userId: userId!,
+      razorpayPaymentId: razorpayPaymentId,
+      deliveryOption: _selectedOption,
+      gst: gst.toStringAsFixed(2),
+      courier: courierCharges.toStringAsFixed(2),
+    );
+
+    if (!mounted) return;
+
+    if (result['success'] == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message'] ?? "Order placed successfully"),
+        ),
+      );
+
+      // clear cart
+      await CartDatabaseService.instance.clearCart();
+
+      // navigate success
+      if (!mounted) return;
+      Navigator.pushNamed(context, AppRoutes.orderSuccess);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? "Order failed")),
+      );
+    }
+  }
+}

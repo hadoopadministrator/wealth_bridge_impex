@@ -298,11 +298,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _onRegisterPressed() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (_gstController.text.trim().isEmpty) {
-      _showMessage('Please enter GST');
-      return;
-    }
-
     setState(() => _isLoading = true);
 
     try {

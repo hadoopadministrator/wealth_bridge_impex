@@ -209,16 +209,9 @@ class _MyCartScreenState extends State<MyCartScreen> {
                         width: double.infinity,
                         text: 'Proceed to Checkout',
                         onPressed: () {
-                          // ScaffoldMessenger.of(context).showSnackBar(
-                          //   const SnackBar(
-                          //     content: Text('Coming soon'),
-                          //     duration: Duration(seconds: 2),
-                          //   ),
-                          // );
                            Navigator.pushNamed(
                               context,
-                              AppRoutes.checkOut,
-                              // arguments: _cartItems,
+                              AppRoutes.byCheckOut,
                             );
                         },
                       ),

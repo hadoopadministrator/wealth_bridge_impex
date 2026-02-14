@@ -31,8 +31,9 @@ class _SellCheckoutScreenState extends State<SellCheckoutScreen> {
   @override
   void initState() {
     super.initState();
+    _quantity = 1; // default value
+    _qtyController = TextEditingController(text: _quantity.toString());
     _loadCart();
-    //  paymentService.initPayment();s
   }
 
   Future<void> _loadCart() async {
@@ -124,60 +125,101 @@ class _SellCheckoutScreenState extends State<SellCheckoutScreen> {
                 label: 'Price',
                 value: totalPrice.toStringAsFixed(2),
               ),
-              const Text(
-                "Quantity (KG)",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xfff8f9fa),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey, width: 1),
-                ),
-                child: Text(
-                  totalQty.toStringAsFixed(2),
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-
-              TextField(
-                controller: _qtyController,
-                keyboardType: TextInputType.number,
-                cursorColor: AppColors.black,
-                textInputAction: TextInputAction.done,
-                decoration: AppDecorations.textField(
-                  label: '',
-                  suffixIcon: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      InkWell(
-                        onTap: _incrementQty,
-                        child: const Icon(Icons.keyboard_arrow_up, size: 22),
-                      ),
-                      InkWell(
-                        onTap: _decrementQty,
-                        child: const Icon(Icons.keyboard_arrow_down, size: 22),
-                      ),
-                    ],
+              const SizedBox(height: 24),
+              // const Text(
+              //   "Quantity (KG)",
+              //   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              // ),
+              // const SizedBox(height: 8),
+              // Container(
+              //   width: double.infinity,
+              //   padding: const EdgeInsets.all(14),
+              //   decoration: BoxDecoration(
+              //     color: const Color(0xfff8f9fa),
+              //     borderRadius: BorderRadius.circular(8),
+              //     border: Border.all(color: Colors.grey, width: 1),
+              //   ),
+              //   child: Text(
+              //     totalQty.toStringAsFixed(2),
+              //     style: const TextStyle(fontSize: 16),
+              //   ),
+              // ),
+              Row(
+                children: [
+                  /// Lot dropdown (UI only)
+                  Expanded(
+                    flex: 2,
+                    child: DropdownButtonFormField<String>(
+                      value: 'Lot 1 - 60 KG',
+                      decoration: AppDecorations.textField(label: 'Select Lot'),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'Lot 1 - 60 KG',
+                          child: Text('Lot 1 - 60 KG'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Lot 2 - 70 KG',
+                          child: Text('Lot 2 - 70 KG'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'Lot 3 - 100 KG',
+                          child: Text('Lot 3 - 100 KG'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        // UI only, no logic
+                      },
+                    ),
                   ),
-                ),
-                onChanged: (value) {
-                  final parsed = int.tryParse(value);
-                  if (parsed != null && parsed > 0) {
-                    setState(() => _quantity = parsed);
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
-              SummaryRowCard(
-                label: 'Quantity (KG)',
-                value: totalQty.toStringAsFixed(2),
-              ),
 
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    flex: 1,
+                    child: TextField(
+                      controller: _qtyController,
+                      keyboardType: TextInputType.number,
+                      cursorColor: AppColors.black,
+                      textInputAction: TextInputAction.done,
+                      decoration: AppDecorations.textField(
+                        label: '',
+                        suffixIcon: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            InkWell(
+                              onTap: _incrementQty,
+                              child: const Icon(
+                                Icons.keyboard_arrow_up,
+                                size: 22,
+                              ),
+                            ),
+                            InkWell(
+                              onTap: _decrementQty,
+                              child: const Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 22,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      onChanged: (value) {
+                        final parsed = int.tryParse(value);
+                        if (parsed != null && parsed > 0) {
+                          setState(() => _quantity = parsed);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 24),
+              // SummaryRowCard(
+              //   label: 'Quantity (KG)',
+              //   value: totalQty.toStringAsFixed(2),
+              // ),
+
+              // const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

@@ -10,6 +10,7 @@ import 'package:wealth_bridge_impex/screens/order_history.dart';
 import 'package:wealth_bridge_impex/screens/order_success_screen.dart';
 import 'package:wealth_bridge_impex/screens/profile_screen.dart';
 import 'package:wealth_bridge_impex/screens/register_screen.dart';
+import 'package:wealth_bridge_impex/screens/sell_checkout_screen.dart';
 import 'package:wealth_bridge_impex/screens/splash_screen.dart';
 
 class AppRoutes {
@@ -24,7 +25,8 @@ class AppRoutes {
   static const String contactUs = '/contactUs';
   static const String aboutUs = '/aboutUs';
   static const String orderHistory = '/orderHistory';
-  static const String checkOut = '/checkOut';
+  static const String byCheckOut = '/byCheckOut';
+  static const String sellCheckOut = '/sellCheckOut';
   static const String orderSuccess = '/orderSuccess';
   static const String profile = '/profile';
   static const String cart = '/cart';
@@ -38,7 +40,8 @@ class AppRoutes {
     contactUs: (context) => const ContactUsScreen(),
     aboutUs: (context) => const AboutUsScreen(),
     orderHistory: (context) => const OrderHistory(),
-    checkOut: (context) => const ByCheckoutScreen(),
+    byCheckOut: (context) => const ByCheckoutScreen(),
+    sellCheckOut: (context) => const SellCheckoutScreen(),
     orderSuccess: (context) => const OrderSuccessScreen(),
     profile: (context) => const ProfileScreen(),
     cart: (context) => const MyCartScreen(),
