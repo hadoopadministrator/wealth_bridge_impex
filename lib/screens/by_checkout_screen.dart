@@ -135,7 +135,7 @@ class _ByCheckoutScreenState extends State<ByCheckoutScreen> {
               const SizedBox(height: 24),
               SummaryRowCard(
                 label: 'Price',
-                value: totalPrice.toStringAsFixed(2),
+                value: subTotal.toStringAsFixed(2),
               ),
               const SizedBox(height: 24),
               SummaryRowCard(

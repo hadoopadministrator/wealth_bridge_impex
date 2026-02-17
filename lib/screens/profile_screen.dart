@@ -117,10 +117,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    if (gst.isEmpty) {
-      _showMessage('GST number is required');
-      return;
-    }
+    // if (gst.isEmpty) {
+    //   _showMessage('GST number is required');
+    //   return;
+    // }
 
     setState(() => _isLoading = true);
 

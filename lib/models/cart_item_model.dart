@@ -2,8 +2,8 @@ class CartItemModel {
   final int? id;
   final int slabId;
   final String slab;
- final double buyPrice;    // renamed from price for clarity
-  final double sellPrice;   // new field
+ final double buyPrice;
+  final double sellPrice;
   final double qty;
   final double amount;
   final String createdAt;
@@ -13,7 +13,7 @@ class CartItemModel {
     required this.slabId,
     required this.slab,
     required this.buyPrice,
-    required this.sellPrice,  // new
+    required this.sellPrice,
     required this.qty,
     required this.amount,
     required this.createdAt,
@@ -26,7 +26,7 @@ class CartItemModel {
        slabId: map['slabId'] as int,
       slab: map['slab'] as String,
        buyPrice: (map['buyPrice'] as num).toDouble(),
-      sellPrice: (map['sellPrice'] as num).toDouble(),  // new
+      sellPrice: (map['sellPrice'] as num).toDouble(),
       qty: (map['qty'] as num).toDouble(),
       amount: (map['amount'] as num).toDouble(),
       createdAt: map['createdAt'] as String,
@@ -40,7 +40,7 @@ class CartItemModel {
       'slabId': slabId,
       'slab': slab,
       'buyPrice': buyPrice,
-      'sellPrice': sellPrice,  // new
+      'sellPrice': sellPrice,
       'qty': qty,
       'amount': amount,
       'createdAt': createdAt,

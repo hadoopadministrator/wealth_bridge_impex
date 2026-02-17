@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:wealth_bridge_impex/routes/app_routes.dart';
+import 'package:wealth_bridge_impex/services/api_service.dart';
+import 'package:wealth_bridge_impex/services/auth_storage.dart';
 import 'package:wealth_bridge_impex/utils/app_colors.dart';
 import 'package:wealth_bridge_impex/widgets/order_card.dart';
 
@@ -10,44 +13,45 @@ class OrderHistory extends StatefulWidget {
 }
 
 class _OrderHistoryState extends State<OrderHistory> {
-  int selectedTab = 0; // 0 = Buy, 1 = Sell
+  int selectedTab = 0;
+  List<Map<String, dynamic>> orders = [];
+  bool isLoading = true;
 
-  /// STATIC DATA (replace later with API)
-  final List<Map<String, String>> orders = [
-    {
-      "date": "21/01/26",
-      "slab": "0.50 kg",
-      "type": "Buy",
-      "quantity": "3",
-      "total": "₹16,680",
-      "status": "Paid",
-    },
-    {
-      "date": "22/01/26",
-      "slab": "0.50 kg",
-      "type": "Sell",
-      "quantity": "2",
-      "total": "₹27,900",
-      "status": "Completed",
-    },
-    {
-      "date": "24/01/26",
-      "slab": "1 kg",
-      "type": "Buy",
-      "quantity": "5",
-      "total": "₹27,800",
-      "status": "Paid",
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchOrders();
+  }
+
+  Future<void> fetchOrders() async {
+    final userId = await AuthStorage.getUserId();
+    if (userId == null) return;
+    // Example: Replace 4 with actual logged-in user's ID
+    final result = await ApiService().getOrdersByUser(userId: userId);
+    if (!mounted) return;
+    if (result['success'] == true) {
+      setState(() {
+        // Convert dynamic list to Map<String, dynamic>
+        orders = List<Map<String, dynamic>>.from(result['data']);
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        orders = [];
+        isLoading = false;
+      });
+      // Optionally show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? 'Failed to fetch orders')),
+      );
+    }
+  }
 
   /// FILTERED LIST
-  List<Map<String, String>> get filteredOrders {
+  List<Map<String, dynamic>> get filteredOrders {
     return orders.where((order) {
-      if (selectedTab == 0) {
-        return order["type"] == "Buy";
-      } else {
-        return order["type"] == "Sell";
-      }
+      final type = (order["Type"] ?? "").toString().trim().toUpperCase();
+      return selectedTab == 0 ? type == "BUY" : type == "SELL";
     }).toList();
   }
 
@@ -66,31 +70,17 @@ class _OrderHistoryState extends State<OrderHistory> {
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            /// BUY / SELL SWITCH
-            buildTabs(),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  /// BUY / SELL SWITCH
+                  buildTabs(),
 
-            /// LIST
-            Expanded(child: buildOrderList()),
-          ],
-        ),
-
-        // ListView.builder(
-        //   padding: const EdgeInsets.all(16),
-        //   itemCount: orders.length,
-        //   itemBuilder: (context,s index) {
-        //     final order = orders[index];
-        //     return OrderCard(
-        //       date: order["date"]!,
-        //       slab: order["slab"]!,
-        //       type: order["type"]!,
-        //       quantity: order["quantity"]!,
-        //       total: order["total"]!,
-        //       status: order["status"]!,
-        //     );
-        //   },
-        // ),
+                  /// LIST
+                  Expanded(child: buildOrderList()),
+                ],
+              ),
       ),
     );
   }
@@ -125,7 +115,9 @@ class _OrderHistoryState extends State<OrderHistory> {
                   child: Text(
                     "BUY",
                     style: TextStyle(
-                      color: selectedTab == 0 ? AppColors.white : AppColors.black,
+                      color: selectedTab == 0
+                          ? AppColors.white
+                          : AppColors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -155,7 +147,9 @@ class _OrderHistoryState extends State<OrderHistory> {
                   child: Text(
                     "SELL",
                     style: TextStyle(
-                      color: selectedTab == 1 ? AppColors.white : AppColors.black,
+                      color: selectedTab == 1
+                          ? AppColors.white
+                          : AppColors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
@@ -191,20 +185,28 @@ class _OrderHistoryState extends State<OrderHistory> {
     if (filteredOrders.isEmpty) {
       return buildEmptyState();
     }
-
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       itemCount: filteredOrders.length,
       itemBuilder: (context, index) {
         final order = filteredOrders[index];
 
-        return OrderCard(
-          date: order["date"]!,
-          slab: order["slab"]!,
-          type: order["type"]!,
-          quantity: order["quantity"]!,
-          total: order["total"]!,
-          status: order["status"]!,
+        return GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              AppRoutes.orderDetails,
+              arguments: {'orderId': order["Id"]},
+            );
+          },
+          child: OrderCard(
+            date: order["OrderDateTime"] ?? "",
+            slab: order["Slab"] ?? "",
+            type: order["Type"] ?? "",
+            quantity: order["Qty"]?.toString() ?? "",
+            total: "₹${order["Total"]?.toStringAsFixed(2) ?? "0"}",
+            status: order["PaymentStatus"] ?? "",
+          ),
         );
       },
     );

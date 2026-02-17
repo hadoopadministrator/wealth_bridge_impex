@@ -314,4 +314,68 @@ class ApiService {
       return {'success': false, 'message': 'Something went wrong'};
     }
   }
+
+/// GET ORDERS BY USER
+Future<Map<String, dynamic>> getOrdersByUser({required int userId}) async {
+  final Uri url = Uri.parse('$_baseUrl/GetOrdersByUser').replace(
+    queryParameters: {'user_id': userId.toString()},
+  );
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode != 200) {
+      return {'success': false, 'message': 'Server error: ${response.statusCode}'};
+    }
+
+    // Remove XML wrapper
+    final cleanJson = response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+    // Decode JSON
+    final List<dynamic> jsonData = jsonDecode(cleanJson);
+    // print('\ngetOrdersByUser:$jsonData\n');
+
+    return {
+      'success': true,
+      'data': jsonData,
+    };
+  } catch (e) {
+    return {'success': false, 'message': 'Something went wrong'};
+  }
+}
+
+/// GET ORDER BY ID
+Future<Map<String, dynamic>> getOrderById({required int orderId}) async {
+  final Uri url = Uri.parse('$_baseUrl/GetOrderByID').replace(
+    queryParameters: {'id': orderId.toString()},
+  );
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode != 200) {
+      return {'success': false, 'message': 'Server error: ${response.statusCode}'};
+    }
+
+    // Remove XML wrapper
+    final cleanJson = response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+    // Decode JSON
+    final List<dynamic> jsonData = jsonDecode(cleanJson);
+    // print('\ngetOrderById:$jsonData\n');
+
+
+    // Usually GetOrderByID returns a list with one object, extract first
+    final Map<String, dynamic> orderData =
+        jsonData.isNotEmpty ? Map<String, dynamic>.from(jsonData[0]) : {};
+
+    return {
+      'success': true,
+      'data': orderData,
+    };
+  } catch (e) {
+    return {'success': false, 'message': 'Something went wrong'};
+  }
+}
+
 }

@@ -280,7 +280,7 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                                     vertical: 12,
                                     horizontal: 14,
                                   ),
-                                  onPressed: () async {
+                                  onPressed: ()  {
                                     // final messenger = ScaffoldMessenger.of(
                                     //   context,
                                     // );
@@ -292,11 +292,11 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
                                     //   ),
                                     // );
                                     final navigator = Navigator.of(context);
-                                    await _addToCart(
-                                      index: index,
-                                      slab: slab,
-                                      slabName: slabName,
-                                    );
+                                    // await _addToCart(
+                                    //   index: index,
+                                    //   slab: slab,
+                                    //   slabName: slabName,
+                                    // );
                                     navigator.pushNamed(AppRoutes.sellCheckOut);
                                   },
                                 ),

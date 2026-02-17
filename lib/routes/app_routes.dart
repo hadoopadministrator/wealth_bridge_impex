@@ -6,6 +6,7 @@ import 'package:wealth_bridge_impex/screens/forgot_password_screen.dart';
 import 'package:wealth_bridge_impex/screens/live_rates_screen.dart';
 import 'package:wealth_bridge_impex/screens/login_screen.dart';
 import 'package:wealth_bridge_impex/screens/my_cart_screen.dart';
+import 'package:wealth_bridge_impex/screens/order_details.dart';
 import 'package:wealth_bridge_impex/screens/order_history.dart';
 import 'package:wealth_bridge_impex/screens/order_success_screen.dart';
 import 'package:wealth_bridge_impex/screens/profile_screen.dart';
@@ -25,6 +26,7 @@ class AppRoutes {
   static const String contactUs = '/contactUs';
   static const String aboutUs = '/aboutUs';
   static const String orderHistory = '/orderHistory';
+  static const String orderDetails = '/orderDetails';
   static const String byCheckOut = '/byCheckOut';
   static const String sellCheckOut = '/sellCheckOut';
   static const String orderSuccess = '/orderSuccess';
@@ -40,6 +42,7 @@ class AppRoutes {
     contactUs: (context) => const ContactUsScreen(),
     aboutUs: (context) => const AboutUsScreen(),
     orderHistory: (context) => const OrderHistory(),
+    orderDetails: (context) => const OrderDetails(),
     byCheckOut: (context) => const ByCheckoutScreen(),
     sellCheckOut: (context) => const SellCheckoutScreen(),
     orderSuccess: (context) => const OrderSuccessScreen(),

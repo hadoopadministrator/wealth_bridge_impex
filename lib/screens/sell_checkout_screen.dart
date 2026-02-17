@@ -20,6 +20,7 @@ class _SellCheckoutScreenState extends State<SellCheckoutScreen> {
   late int _quantity;
   List<CartItemModel> cartItems = [];
   bool _loading = true;
+  String selectedLot = 'Lot 1 - 60 KG';
 
   String _selectedOption = 'Physical Delivery';
 
@@ -150,7 +151,7 @@ class _SellCheckoutScreenState extends State<SellCheckoutScreen> {
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String>(
-                      value: 'Lot 1 - 60 KG',
+                      initialValue: 'Lot 1 - 60 KG',
                       decoration: AppDecorations.textField(label: 'Select Lot'),
                       items: const [
                         DropdownMenuItem(
@@ -167,7 +168,9 @@ class _SellCheckoutScreenState extends State<SellCheckoutScreen> {
                         ),
                       ],
                       onChanged: (value) {
-                        // UI only, no logic
+                        setState(() {
+                          selectedLot = value!;
+                        });
                       },
                     ),
                   ),
