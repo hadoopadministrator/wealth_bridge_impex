@@ -32,7 +32,7 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
   // ---------------- API ----------------
 
   Future<void> _fetchLiveRates({bool showLoader = false}) async {
-    debugPrint("LiveRates API called at: ${DateTime.now().toString()}");
+    // debugPrint("LiveRates API called at: ${DateTime.now().toString()}");
     if (showLoader && mounted) {
       setState(() => _isLoading = true);
     }
@@ -57,7 +57,7 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
   void _startAutoFetch() {
     _fetchTimer?.cancel();
     _fetchTimer = Timer.periodic(const Duration(seconds: 300), (_) {
-      debugPrint("Timer triggered at: ${DateTime.now()}");
+      // debugPrint("Timer triggered at: ${DateTime.now()}");
       _fetchLiveRates();
     });
   }
@@ -393,7 +393,7 @@ class _LiveRatesScreenState extends State<LiveRatesScreen> {
         minWeight: minQty,
         maxWeight: maxQty ?? unitQty,
       );
-      debugPrint("ADD TO CART API RESULT: $slab");
+      // debugPrint("ADD TO CART API RESULT: $slab");
       if (apiResult['success'] != true) {
         return false;
       }
