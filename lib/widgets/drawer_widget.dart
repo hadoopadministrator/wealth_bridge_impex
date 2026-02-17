@@ -26,11 +26,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ),
 
           /// LIVE PRICES (HOME)
-          /// Always go back to first/root screen
           ListTile(
             leading: const Icon(Icons.home, color: AppColors.black),
             title: const Text('Live Prices', style: TextStyle(fontSize: 18)),
             onTap: () {
+              Navigator.pop(context);
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 AppRoutes.liveRates,
@@ -40,7 +40,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ),
 
           /// PROFILE
-          /// Normal push, back press should return to previous screen
           ListTile(
             leading: const Icon(Icons.person, color: AppColors.black),
             title: const Text('Profile', style: TextStyle(fontSize: 18)),
@@ -51,8 +50,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ),
 
           /// ORDER HISTORY
-          /// Drawer se hamesha simple push
-          /// Never clear stack here
           ListTile(
             leading: const Icon(Icons.history, color: AppColors.black),
             title: const Text('Order History', style: TextStyle(fontSize: 18)),
@@ -61,6 +58,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               Navigator.pushNamed(context, AppRoutes.orderHistory);
             },
           ),
+          const Divider(),
 
           /// VISIT WEBSITE
           ListTile(
@@ -105,6 +103,32 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             },
           ),
 
+          /// PRIVACY POLICY
+          ListTile(
+            leading: const Icon(
+              Icons.privacy_tip_outlined,
+              color: AppColors.black,
+            ),
+            title: const Text('Privacy Policy', style: TextStyle(fontSize: 18)),
+            onTap: () async {
+              final messenger = ScaffoldMessenger.of(context);
+              Navigator.pop(context);
+              final Uri url = Uri.parse(
+                'https://wealthbridgeimpex.com/',
+              );
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              } else {
+                messenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Could not open privacy policy'),
+                  ),
+                );
+              }
+            },
+          ),
+          const Divider(),
+
           /// SHARE APP
           ListTile(
             leading: const Icon(Icons.share, color: AppColors.black),
@@ -134,9 +158,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               );
             },
           ),
+          const Divider(),
 
           /// LOGOUT
-          /// Clear full stack and go to Login
           ListTile(
             leading: const Icon(Icons.logout, color: AppColors.black),
             title: const Text('Logout', style: TextStyle(fontSize: 18)),
@@ -147,7 +171,39 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     );
   }
 
+  /// LOGOUT WITH CONFIRMATION
   Future<void> _logout() async {
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text(
+            'Are you sure you want to logout?',
+          ),
+          actions: [
+
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              child: const Text('Cancel'),
+            ),
+
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirm != true) return;
+
     await AuthStorage.clear();
 
     if (!mounted) return;
@@ -158,4 +214,5 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       (route) => false,
     );
   }
+
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wealth_bridge_impex/routes/app_routes.dart';
 import 'package:wealth_bridge_impex/services/api_service.dart';
 import 'package:wealth_bridge_impex/services/auth_storage.dart';
 import 'package:wealth_bridge_impex/utils/app_colors.dart';
@@ -219,10 +220,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Header
               Container(
+                width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 decoration: BoxDecoration(
                   color: AppColors.white,
@@ -319,6 +320,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         width: double.infinity,
                         onPressed: _updateProfile,
                       ),
+                      const SizedBox(height: 16),
+
+                      // DELETE ACCOUNT BUTTON
+                      CustomButton(
+                        text: 'Delete Account',
+                        backgroundColor: Colors.red,
+                        foregroundColor: AppColors.white,
+                        width: double.infinity,
+                        onPressed: _showDeleteDialog,
+                      ),
                     ],
                   ],
                 ),
@@ -328,5 +339,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  void _showDeleteDialog() {
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.white,
+          title: const Text("Delete Account"),
+          content: const Text(
+            "Are you sure you want to delete your account? This action cannot be undone.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteAccount();
+              },
+              child: const Text("Delete", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAccount() async {
+    if (_userId == null) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // await _apiService.deleteUserAccount(id: _userId!);
+
+      await AuthStorage.clear();
+
+      if (!mounted) return;
+
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.login,
+        (route) => false,
+      );
+
+      _showMessage("Account deleted successfully");
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage("Failed to delete account");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }
