@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/services/api_service.dart';
-import 'package:wealth_bridge_impex/services/auth_storage.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
-import 'package:wealth_bridge_impex/widgets/order_card.dart';
+import 'package:copper_hub/routes/app_routes.dart';
+import 'package:copper_hub/services/api_service.dart';
+import 'package:copper_hub/services/auth_storage.dart';
+import 'package:copper_hub/utils/app_colors.dart';
+import 'package:copper_hub/widgets/order_card.dart';
 
 class OrderHistory extends StatefulWidget {
   const OrderHistory({super.key});

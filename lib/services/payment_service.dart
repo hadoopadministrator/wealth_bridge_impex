@@ -27,7 +27,7 @@ class PaymentService {
     var options = {
       'key': 'rzp_live_S4YU2wG1qoN7Cl',
       'amount': (amount * 100).toInt(),
-      'name': 'Wealth Bridge Impex',
+      'name': 'Copper Hub',
       'description': 'Copper Order Payment',
       'prefill': {'contact': contact, 'email': email},
       'external': {

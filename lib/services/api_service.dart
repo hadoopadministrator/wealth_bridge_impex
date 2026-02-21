@@ -189,6 +189,51 @@ class ApiService {
       return {'success': false, 'message': 'Something went wrong'};
     }
   }
+  
+  /// DELETE USER ACCOUNT (GET)
+Future<Map<String, dynamic>> deleteUserAccount({
+  required int userId,
+}) async {
+  final Uri url = Uri.parse('$_baseUrl/DeleteUserAccount').replace(
+    queryParameters: {
+      'id': userId.toString(),
+    },
+  );
+
+  try {
+    final response = await http.get(url);
+
+    if (response.statusCode != 200) {
+      return {
+        'success': false,
+        'message': 'Server error: ${response.statusCode}',
+      };
+    }
+
+    // Remove XML wrapper
+    final cleanJson =
+        response.body.replaceAll(RegExp(r'<[^>]*>'), '').trim();
+
+    final Map<String, dynamic> jsonData = jsonDecode(cleanJson);
+
+    final bool isSuccess =
+        jsonData['Status']?.toString().toLowerCase() == 'success';
+
+    return {
+      'success': isSuccess,
+      'message': jsonData['Message'] ??
+          (isSuccess
+              ? 'Account deleted successfully'
+              : 'Failed to delete account'),
+      'data': jsonData,
+    };
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Something went wrong',
+    };
+  }
+}
 
   /// GET LIVE COPPER RATE
   Future<Map<String, dynamic>> getLiveCopperRate() async {

@@ -1,5 +1,5 @@
+import 'package:copper_hub/utils/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
  final String text;

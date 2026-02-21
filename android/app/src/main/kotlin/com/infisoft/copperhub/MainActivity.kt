@@ -1,4 +1,4 @@
-package com.infisoft.wealthbridgeimpex
+package com.infisoft.copperhub
 
 import io.flutter.embedding.android.FlutterActivity
 

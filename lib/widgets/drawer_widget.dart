@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/services/auth_storage.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
+import 'package:copper_hub/routes/app_routes.dart';
+import 'package:copper_hub/services/auth_storage.dart';
+import 'package:copper_hub/utils/app_colors.dart';
 
 class DrawerWidget extends StatefulWidget {
   const DrawerWidget({super.key});

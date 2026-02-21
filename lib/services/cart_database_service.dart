@@ -1,6 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:wealth_bridge_impex/models/cart_item_model.dart';
+import 'package:copper_hub/models/cart_item_model.dart';
 
 class CartDatabaseService {
   CartDatabaseService._();

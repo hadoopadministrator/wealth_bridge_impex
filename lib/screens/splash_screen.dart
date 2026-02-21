@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/services/auth_storage.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
+import 'package:copper_hub/routes/app_routes.dart';
+import 'package:copper_hub/services/auth_storage.dart';
+import 'package:copper_hub/utils/app_colors.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -47,11 +47,6 @@ class _SplashScreenState extends State<SplashScreen> {
                   width: 280,
                   fit: BoxFit.contain,
                 ),
-                // const SizedBox(height: 16),
-                // Text(
-                //   'Wealth Bridge Impex',
-                //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                // ),
                 const SizedBox(height: 10),
                 Text(
                   'Bridging Global Trade & Wealth',

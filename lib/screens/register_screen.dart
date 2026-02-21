@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/services/api_service.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
-import 'package:wealth_bridge_impex/utils/input_decoration.dart';
-import 'package:wealth_bridge_impex/widgets/custom_button.dart';
+import 'package:copper_hub/routes/app_routes.dart';
+import 'package:copper_hub/services/api_service.dart';
+import 'package:copper_hub/utils/app_colors.dart';
+import 'package:copper_hub/utils/input_decoration.dart';
+import 'package:copper_hub/widgets/custom_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

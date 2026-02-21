@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
-import 'package:wealth_bridge_impex/widgets/custom_button.dart';
+import 'package:copper_hub/routes/app_routes.dart';
+import 'package:copper_hub/utils/app_colors.dart';
+import 'package:copper_hub/widgets/custom_button.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
   const OrderSuccessScreen({super.key});

@@ -1,18 +1,18 @@
+import 'package:copper_hub/screens/about_us_screen.dart';
+import 'package:copper_hub/screens/by_checkout_screen.dart';
+import 'package:copper_hub/screens/contact_us_screen.dart';
+import 'package:copper_hub/screens/forgot_password_screen.dart';
+import 'package:copper_hub/screens/live_rates_screen.dart';
+import 'package:copper_hub/screens/login_screen.dart';
+import 'package:copper_hub/screens/my_cart_screen.dart';
+import 'package:copper_hub/screens/order_details.dart';
+import 'package:copper_hub/screens/order_history.dart';
+import 'package:copper_hub/screens/order_success_screen.dart';
+import 'package:copper_hub/screens/profile_screen.dart';
+import 'package:copper_hub/screens/register_screen.dart';
+import 'package:copper_hub/screens/sell_checkout_screen.dart';
+import 'package:copper_hub/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/screens/about_us_screen.dart';
-import 'package:wealth_bridge_impex/screens/by_checkout_screen.dart';
-import 'package:wealth_bridge_impex/screens/contact_us_screen.dart';
-import 'package:wealth_bridge_impex/screens/forgot_password_screen.dart';
-import 'package:wealth_bridge_impex/screens/live_rates_screen.dart';
-import 'package:wealth_bridge_impex/screens/login_screen.dart';
-import 'package:wealth_bridge_impex/screens/my_cart_screen.dart';
-import 'package:wealth_bridge_impex/screens/order_details.dart';
-import 'package:wealth_bridge_impex/screens/order_history.dart';
-import 'package:wealth_bridge_impex/screens/order_success_screen.dart';
-import 'package:wealth_bridge_impex/screens/profile_screen.dart';
-import 'package:wealth_bridge_impex/screens/register_screen.dart';
-import 'package:wealth_bridge_impex/screens/sell_checkout_screen.dart';
-import 'package:wealth_bridge_impex/screens/splash_screen.dart';
 
 class AppRoutes {
   AppRoutes._(); // prevents instantiation

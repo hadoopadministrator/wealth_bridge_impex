@@ -1,7 +1,7 @@
+import 'package:copper_hub/utils/app_colors.dart';
+import 'package:copper_hub/utils/input_decoration.dart';
+import 'package:copper_hub/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
-import 'package:wealth_bridge_impex/utils/input_decoration.dart';
-import 'package:wealth_bridge_impex/widgets/custom_button.dart';
 
 class ContactUsScreen extends StatefulWidget {
   const ContactUsScreen({super.key});

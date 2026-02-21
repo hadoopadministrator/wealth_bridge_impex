@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/services/cart_database_service.dart';
-import 'package:wealth_bridge_impex/models/cart_item_model.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
-import 'package:wealth_bridge_impex/widgets/custom_button.dart';
+import 'package:copper_hub/routes/app_routes.dart';
+import 'package:copper_hub/services/cart_database_service.dart';
+import 'package:copper_hub/models/cart_item_model.dart';
+import 'package:copper_hub/utils/app_colors.dart';
+import 'package:copper_hub/widgets/custom_button.dart';
 
 class MyCartScreen extends StatefulWidget {
   const MyCartScreen({super.key});

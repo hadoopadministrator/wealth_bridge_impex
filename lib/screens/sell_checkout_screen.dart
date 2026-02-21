@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/models/cart_item_model.dart';
-import 'package:wealth_bridge_impex/services/cart_database_service.dart';
-import 'package:wealth_bridge_impex/services/payment_service.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
-import 'package:wealth_bridge_impex/utils/input_decoration.dart';
-import 'package:wealth_bridge_impex/widgets/custom_button.dart';
-import 'package:wealth_bridge_impex/widgets/custom_dropdown.dart';
-import 'package:wealth_bridge_impex/widgets/summary_row_card.dart';
+import 'package:copper_hub/models/cart_item_model.dart';
+import 'package:copper_hub/services/cart_database_service.dart';
+import 'package:copper_hub/services/payment_service.dart';
+import 'package:copper_hub/utils/app_colors.dart';
+import 'package:copper_hub/utils/input_decoration.dart';
+import 'package:copper_hub/widgets/custom_button.dart';
+import 'package:copper_hub/widgets/custom_dropdown.dart';
+import 'package:copper_hub/widgets/summary_row_card.dart';
 
 class SellCheckoutScreen extends StatefulWidget {
   const SellCheckoutScreen({super.key});

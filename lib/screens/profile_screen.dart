@@ -1,11 +1,12 @@
+import 'package:copper_hub/services/cart_database_service.dart';
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/routes/app_routes.dart';
-import 'package:wealth_bridge_impex/services/api_service.dart';
-import 'package:wealth_bridge_impex/services/auth_storage.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
-import 'package:wealth_bridge_impex/utils/input_decoration.dart';
-import 'package:wealth_bridge_impex/widgets/custom_button.dart';
-import 'package:wealth_bridge_impex/widgets/info_row.dart';
+import 'package:copper_hub/routes/app_routes.dart';
+import 'package:copper_hub/services/api_service.dart';
+import 'package:copper_hub/services/auth_storage.dart';
+import 'package:copper_hub/utils/app_colors.dart';
+import 'package:copper_hub/utils/input_decoration.dart';
+import 'package:copper_hub/widgets/custom_button.dart';
+import 'package:copper_hub/widgets/info_row.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -373,24 +374,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _deleteAccount() async {
-    if (_userId == null) return;
+    if (_userId == null) {
+      _showMessage("User not found");
+      return;
+    }
 
     setState(() => _isLoading = true);
 
     try {
-      // await _apiService.deleteUserAccount(id: _userId!);
+      final result = await _apiService.deleteUserAccount(userId: _userId!);
 
-      await AuthStorage.clear();
+      if (result['success'] == true) {
+        // clear login storage
+        await AuthStorage.clear();
+        await CartDatabaseService.instance.clearCart();
 
-      if (!mounted) return;
-
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppRoutes.login,
-        (route) => false,
-      );
-
-      _showMessage("Account deleted successfully");
+        if (!mounted) return;
+        _showMessage(result['message'] ?? "Account deleted successfully");
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          AppRoutes.login,
+          (route) => false,
+        );
+      } else {
+        _showMessage(result['message'] ?? "Failed to delete account");
+      }
     } catch (e) {
       if (!mounted) return;
       _showMessage("Failed to delete account");

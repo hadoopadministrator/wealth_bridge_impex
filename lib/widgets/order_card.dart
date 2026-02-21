@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wealth_bridge_impex/utils/app_colors.dart';
+import 'package:copper_hub/utils/app_colors.dart';
 
 class OrderCard extends StatelessWidget {
   final String date;
