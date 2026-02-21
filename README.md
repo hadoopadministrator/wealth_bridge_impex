@@ -1,16 +1,62 @@
-# wealth_bridge_impex
+# Copper Hub
 
-A new Flutter project.
+Copper Hub is a Flutter-based mobile application that allows users to buy and sell copper using real-time market rates. The app provides a smooth and secure experience with live pricing, cart management, order placement, and account management.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## Features
 
-A few resources to get you started if this is your first Flutter project:
+- Live copper rate updates
+- Buy copper using available slabs
+- Add items to cart
+- Secure checkout with payment integration
+- Order history tracking
+- User profile management
+- Update profile information
+- Delete account option
+- Local cart storage for fast performance
+- Clean and user-friendly interface
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screens
+
+- Splash Screen
+- Login Screen
+- Register Screen
+- Home Screen (Live Copper Rates)
+- Cart Screen
+- Checkout Screen
+- Order History Screen
+- Profile Screen
+
+---
+
+## Technology Stack
+
+**Frontend**
+- Flutter
+- Dart
+
+**Backend**
+- ASP.NET Web Services (ASMX APIs)
+
+**Local Storage**
+- SQLite (Cart storage)
+- SharedPreferences (Login storage)
+
+**Payment Integration**
+- Razorpay
+
+---
+
+## Project Structure
+
+lib/
+ models/
+ routes/
+ screens/
+ services/
+ utils/
+ widgets/
+ main.dart
